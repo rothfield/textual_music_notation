@@ -1,74 +1,55 @@
 package main
 
 import (
-    "regexp"
-    "strings"
+	"log"
+	"regexp"
+	"strings"
 )
+
+// TokenRegex represents a mapping of regex patterns to token types
+type TokenRegex struct {
+	Pattern *regexp.Regexp
+	Type    TokenType
+}
 
 // Lexer tokenizes the letter notation into individual tokens.
 func Lexer(notation string) []Token {
-    var tokens []Token
+	var tokens []Token
+	notation = strings.TrimSpace(notation)
 
-    notation = strings.TrimSpace(notation)
+	// Define all token patterns in a readable structure
+	tokenPatterns := []TokenRegex{
+		{Pattern: regexp.MustCompile(`\|:|\|\||\|`), Type: Barline},
+		{Pattern: regexp.MustCompile(`-`), Type: Dash},
+		{Pattern: regexp.MustCompile(`\(`), Type: LeftSlur},
+		{Pattern: regexp.MustCompile(`\)`), Type: RightSlur},
+		{Pattern: regexp.MustCompile(`'`), Type: Breath},
+		{Pattern: regexp.MustCompile(`[:;]`), Type: Octave},
+	//	{Pattern: regexp.MustCompile(`~`), Type: Mordent},
+	//	{Pattern: regexp.MustCompile(`[0-8+.]`), Type: Tala},
+	//	{Pattern: regexp.MustCompile(`[a-zA-Z]+`), Type: Lyrics},
+		{Pattern: regexp.MustCompile(`\s+`), Type: Space},
+		{Pattern: regexp.MustCompile(`[SrRgGmMPdDnN]`), Type: Pitch},
+	}
 
-    pitchRegex := regexp.MustCompile(`[S|r|R|g|G|m|M|P|d|D|n|N]`)
-    dashRegex := regexp.MustCompile(`-`)
-    barlineRegex := regexp.MustCompile(`\|:|\|\||\|`)
-    slurRegex := regexp.MustCompile(`[()]`)
-    breathRegex := regexp.MustCompile(`'`)
-    octaveRegex := regexp.MustCompile(`[:;]`)
-    mordentRegex := regexp.MustCompile(`~`)
-    talaRegex := regexp.MustCompile(`[0-8+.]`)
-    lyricsRegex := regexp.MustCompile(`[a-zA-Z]+`)
-    spaceRegex := regexp.MustCompile(`\s+`)
+	// Lexical Analysis Loop
+	for len(notation) > 0 {
+		matched := false
+		for _, tokenRegex := range tokenPatterns {
+			if loc := tokenRegex.Pattern.FindStringIndex(notation); loc != nil && loc[0] == 0 {
+				match := notation[loc[0]:loc[1]]
+				tokens = append(tokens, Token{Type: tokenRegex.Type, Value: match})
+				notation = notation[len(match):]
+				matched = true
+				break
+			}
+		}
+		if !matched {
+			log.Printf("Unrecognized token at: %s\n", notation)
+			notation = notation[1:]
+		}
+	}
 
-    for len(notation) > 0 {
-        switch {
-        case pitchRegex.MatchString(notation):
-            matches := pitchRegex.FindString(notation)
-            tokens = append(tokens, Token{Type: Pitch, Value: matches})
-            notation = notation[len(matches):]
-        case dashRegex.MatchString(notation):
-            matches := dashRegex.FindString(notation)
-            tokens = append(tokens, Token{Type: Dash, Value: matches})
-            notation = notation[len(matches):]
-        case barlineRegex.MatchString(notation):
-            matches := barlineRegex.FindString(notation)
-            tokens = append(tokens, Token{Type: Barline, Value: matches})
-            notation = notation[len(matches):]
-        case slurRegex.MatchString(notation):
-            matches := slurRegex.FindString(notation)
-            tokens = append(tokens, Token{Type: Slur, Value: matches})
-            notation = notation[len(matches):]
-        case breathRegex.MatchString(notation):
-            matches := breathRegex.FindString(notation)
-            tokens = append(tokens, Token{Type: Breath, Value: matches})
-            notation = notation[len(matches):]
-        case octaveRegex.MatchString(notation):
-            matches := octaveRegex.FindString(notation)
-            tokens = append(tokens, Token{Type: Octave, Value: matches})
-            notation = notation[len(matches):]
-        case mordentRegex.MatchString(notation):
-            matches := mordentRegex.FindString(notation)
-            tokens = append(tokens, Token{Type: Mordent, Value: matches})
-            notation = notation[len(matches):]
-        case talaRegex.MatchString(notation):
-            matches := talaRegex.FindString(notation)
-            tokens = append(tokens, Token{Type: Tala, Value: matches})
-            notation = notation[len(matches):]
-        case lyricsRegex.MatchString(notation):
-            matches := lyricsRegex.FindString(notation)
-            tokens = append(tokens, Token{Type: Lyrics, Value: matches})
-            notation = notation[len(matches):]
-        case spaceRegex.MatchString(notation):
-            matches := spaceRegex.FindString(notation)
-            tokens = append(tokens, Token{Type: Space, Value: matches})
-            notation = notation[len(matches):]
-        default:
-            notation = notation[1:]
-        }
-    }
-
-    return tokens
+	return tokens
 }
 

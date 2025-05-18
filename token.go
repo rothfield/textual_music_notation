@@ -7,6 +7,8 @@ type TokenType string
 const (
     Pitch   TokenType = "Pitch"
     Dash    TokenType = "Dash"
+    LeftSlur    TokenType = "LeftSlur"
+    RightSlur    TokenType = "RightSlur"
     Slur    TokenType = "Slur"
     Barline TokenType = "Barline"
     Breath  TokenType = "Breath"
