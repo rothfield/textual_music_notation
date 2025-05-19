@@ -13,7 +13,7 @@ type TokenRegex struct {
 }
 
 // Lexer tokenizes the letter notation into individual tokens.
-func Lexer(notation string) []Token {
+func LetterLineLexer(notation string) []Token {
 	var tokens []Token
 	notation = strings.TrimSpace(notation)
 

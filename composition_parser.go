@@ -4,6 +4,7 @@ import (
     "strings"
 )
 
+// ✅ Composition represents the entire parsed structure
 type Composition struct {
     Paragraphs []Paragraph
 }

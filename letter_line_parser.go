@@ -1,7 +1,6 @@
 package main
 
 import (
-    "strings"
     "fmt"
 )
 
@@ -99,36 +98,6 @@ func ParseLetterLine(tokens []Token) *LetterLine {
 
 
 
-// ✅ ParseNotation is capitalized to be exported
-func ParseNotation(notation string) string {
-    Log("DEBUG","=== Begin Parsing Notation ===")
-   Log("DEBUG","Received Notation:\n%s\n", notation)
-
-    // Lexical analysis
-    tokens := Lexer(notation)
-    Log("DEBUG","Tokens generated: %v\n", tokens)
-
-    // Parse the tokens
-    letterLine := ParseLetterLine(tokens)
-    Log("DEBUG","ParseLetterLine executed successfully.")
-
-    // Build the output
-    var output strings.Builder
-    output.WriteString("=== Parsed Structure ===\n")
-
-    for _, element := range letterLine.Elements {
-        if element.IsBeat {
-            output.WriteString("- Beat:\n")
-            for _, subElement := range element.SubElements {
-                output.WriteString("    - " + string(subElement.Token.Type) + ": " + subElement.Token.Value + "\n")
-            }
-        } else {
-            output.WriteString("- " + string(element.Token.Type) + ": " + element.Token.Value + "\n")
-        }
-    }
-
-    return output.String()
-}
 
 // ✅ DisplayParseTree traverses and displays the structure of LetterLine
 func DisplayParseTree(letterLine *LetterLine) {
@@ -146,27 +115,5 @@ func DisplayParseTree(letterLine *LetterLine) {
 }
 
 
-
-// Test cases to validate the parser
-func TestParseLetterLine() {
-    testCases := []string{
-        "|S- -- -(-  S-r )",
-    }
-
-    for _, testCase := range testCases {
-        fmt.Println("--- Testing: ", testCase)
-        tokens := Lexer(testCase)
-        letterLine := ParseLetterLine(tokens)
-        DisplayParseTree(letterLine)
-    }
-}
-
-func zmain() {
-	InitLogger()
-	defer logFile.Close()
-	Log("DEBUG","Test log message from main")
-  fmt.Println("If you see this, logger should be working.")
-  TestParseLetterLine()
-}
 
 
