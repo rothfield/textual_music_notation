@@ -59,7 +59,7 @@ func RenderParagraph(paragraph Paragraph, formatter *StringFormatter, indent str
     if len(paragraph.UpperAnnotations) > 0 {
         formatter.WriteLine(indent, "Upper Annotations")
         for _, annotation := range paragraph.UpperAnnotations {
-            formatter.WriteAnnotation(indent, string(annotation.Type), annotation.Value)  // Convert TokenType to string
+            formatter.WriteAnnotation(indent, string(annotation.Type), annotation.Value, annotation.Column)  // Convert TokenType to string
         }
     }
 
@@ -82,7 +82,7 @@ func RenderParagraph(paragraph Paragraph, formatter *StringFormatter, indent str
     if len(paragraph.LowerAnnotations) > 0 {
         formatter.WriteLine(indent, "Lower Annotations")
         for _, annotation := range paragraph.LowerAnnotations {
-            formatter.WriteAnnotation(indent, string(annotation.Type), annotation.Value)  // Convert TokenType to string
+            formatter.WriteAnnotation(indent, string(annotation.Type), annotation.Value, annotation.Column)  // Convert TokenType to string
         }
     }
 
@@ -90,7 +90,7 @@ func RenderParagraph(paragraph Paragraph, formatter *StringFormatter, indent str
     if len(paragraph.Lyrics) > 0 {
         formatter.WriteLine(indent, "Lyrics")
         for _, lyric := range paragraph.Lyrics {
-            formatter.WriteAnnotation(indent, string(lyric.Type), lyric.Value)  // Convert TokenType to string
+            formatter.WriteAnnotation(indent, string(lyric.Type), lyric.Value, lyric.Column)  // Fixed to pass Column
         }
     }
 }

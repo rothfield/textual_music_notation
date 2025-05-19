@@ -20,39 +20,39 @@ func (sf *StringFormatter) WriteAnnotation(indent, typ, value string, column int
     sf.Builder.WriteString(fmt.Sprintf(indent+"  - %s: %s [Column=%d]\n", typ, value, column))
 }
 
-// WriteElement writes an element with indentation and X position
-func (sf *StringFormatter) WriteElement(indent, typ, value string, x int) {
-    Log("DEBUG", "Formatting Element - Type: %s, Value: %s, Column: %d", typ, value, x)
+// WriteElement writes an element with indentation and Column position
+func (sf *StringFormatter) WriteElement(indent, typ, value string, column int, octave int, mordent bool, talaMarker string, lyricText string) {
+    Log("DEBUG", "Formatting Element - Type: %s, Value: %s, Column: %d", typ, value, column)
 	sf.Builder.WriteString(fmt.Sprintf(indent+"  - %s: %s [Column=%d]\n", typ, value, column))
 if octave != 0 {
-    sf.Builder.WriteString(fmt.Sprintf(indent+"    - Octave: %d\n", element.Octave))
+    sf.Builder.WriteString(fmt.Sprintf(indent+"    - Octave: %d\n", octave))
 }
 if mordent {
     sf.Builder.WriteString(fmt.Sprintf(indent+"    - Mordent: true\n"))
 }
 if talaMarker != "" {
-    sf.Builder.WriteString(fmt.Sprintf(indent+"    - Tala: %s\n", element.TalaMarker))
+    sf.Builder.WriteString(fmt.Sprintf(indent+"    - Tala: %s\n", talaMarker))
 }
 if lyricText != "" {
-    sf.Builder.WriteString(fmt.Sprintf(indent+"    - Lyric: %s\n", element.LyricText))
+    sf.Builder.WriteString(fmt.Sprintf(indent+"    - Lyric: %s\n", lyricText))
 }
 }
 
-// WriteSubElement writes a sub-element with indentation and X position
-func (sf *StringFormatter) WriteSubElement(indent, typ, value string, x int) {
-    Log("DEBUG", "Formatting SubElement - Type: %s, Value: %s, Column: %d", typ, value, x)
+// WriteSubElement writes a sub-element with indentation and Column position
+func (sf *StringFormatter) WriteSubElement(indent, typ, value string, column int, octave int, mordent bool, talaMarker string, lyricText string) {
+    Log("DEBUG", "Formatting SubElement - Type: %s, Value: %s, Column: %d", typ, value, column)
 	sf.Builder.WriteString(fmt.Sprintf(indent+"    - %s: %s [Column=%d]\n", typ, value, column))
 if octave != 0 {
-    sf.Builder.WriteString(fmt.Sprintf(indent+"      - Octave: %d\n", element.Octave))
+    sf.Builder.WriteString(fmt.Sprintf(indent+"      - Octave: %d\n", octave))
 }
 if mordent {
     sf.Builder.WriteString(fmt.Sprintf(indent+"      - Mordent: true\n"))
 }
 if talaMarker != "" {
-    sf.Builder.WriteString(fmt.Sprintf(indent+"      - Tala: %s\n", element.TalaMarker))
+    sf.Builder.WriteString(fmt.Sprintf(indent+"      - Tala: %s\n", talaMarker))
 }
 if lyricText != "" {
-    sf.Builder.WriteString(fmt.Sprintf(indent+"      - Lyric: %s\n", element.LyricText))
+    sf.Builder.WriteString(fmt.Sprintf(indent+"      - Lyric: %s\n", lyricText))
 }
 }
 
