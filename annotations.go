@@ -13,7 +13,7 @@ type LowerAnnotationLine struct {
 // AnnotationElement represents a single annotation (octave, mordent, tala, or lyric)
 type AnnotationElement struct {
     Token Token
-    X     int // X represents the column position in the line
+    Column     int // Column represents the column position in the line
 }
 
 // ParseUpperAnnotationLine processes the tokens for the upper annotation line
@@ -22,7 +22,7 @@ func ParseUpperAnnotationLine(tokens []Token) *UpperAnnotationLine {
     for i, token := range tokens {
         // Only Octave, Mordent, and Tala are valid in the upper annotation line
         if token.Type == Octave || token.Type == Mordent || token.Type == Tala {
-            elements = append(elements, AnnotationElement{Token: token, X: i})
+            elements = append(elements, AnnotationElement{Token: token, Column: i})
         }
     }
     return &UpperAnnotationLine{
@@ -36,7 +36,7 @@ func ParseLowerAnnotationLine(tokens []Token) *LowerAnnotationLine {
     for i, token := range tokens {
         // Only Lyrics are valid in the lower annotation line
         if token.Type == Lyrics {
-            elements = append(elements, AnnotationElement{Token: token, X: i})
+            elements = append(elements, AnnotationElement{Token: token, Column: i})
         }
     }
     return &LowerAnnotationLine{
@@ -48,14 +48,14 @@ func ParseLowerAnnotationLine(tokens []Token) *LowerAnnotationLine {
 func (ual *UpperAnnotationLine) Display() {
     println("=== Upper Annotation Line ===")
     for _, element := range ual.Elements {
-        println("Element:", element.Token.Value, "at position", element.X)
+        println("Element:", element.Token.Value, "at position", element.Column)
     }
 }
 
 func (lal *LowerAnnotationLine) Display() {
     println("=== Lower Annotation Line ===")
     for _, element := range lal.Elements {
-        println("Element:", element.Token.Value, "at position", element.X)
+        println("Element:", element.Token.Value, "at position", element.Column)
     }
 }
 

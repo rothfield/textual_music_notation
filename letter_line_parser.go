@@ -1,16 +1,16 @@
 package main
 
-import (
-    "fmt"
-)
-
-// ✅ LetterLineElement represents any top-level element (e.g., pitch, dash, barline, beat, etc.)
 type LetterLineElement struct {
     Token       Token
-    X           int
-    SubElements []LetterLineElement // Only for Beats
-    IsBeat      bool                // ✅ New flag to indicate if it's a Beat
+    Column           int
+    SubElements []LetterLineElement
+    IsBeat      bool
+    Octave      int
+    Mordent     bool
+    TalaMarker  string
+    LyricText   string
 }
+
 
 // ✅ LetterLine contains all elements in a line (barlines, pitches, dashes, slurs, and beats)
 type LetterLine struct {
@@ -29,20 +29,20 @@ func ParseLetterLine(tokens []Token) *LetterLine {
             // Start or continue a Beat
             currentBeat = append(currentBeat, LetterLineElement{
                 Token: token,
-                X:     i,
+                Column:     i,
             })
         case LeftSlur, RightSlur, Breath:
             if len(currentBeat) > 0 {
                 // These are part of the Beat if it's active
                 currentBeat = append(currentBeat, LetterLineElement{
                     Token: token,
-                    X:     i,
+                    Column:     i,
                 })
             } else {
                 // If no active Beat, they are standalone
                 lineElements = append(lineElements, LetterLineElement{
                     Token: token,
-                    X:     i,
+                    Column:     i,
                 })
             }
         case Barline:
@@ -50,7 +50,7 @@ func ParseLetterLine(tokens []Token) *LetterLine {
             if len(currentBeat) > 0 {
                 lineElements = append(lineElements, LetterLineElement{
                     Token:       Token{Type: "Beat", Value: "Beat"},
-                    X:           i,
+                    Column:           i,
                     SubElements: currentBeat,
                     IsBeat:      true,
                 })
@@ -59,14 +59,14 @@ func ParseLetterLine(tokens []Token) *LetterLine {
             // Append the Barline separately
             lineElements = append(lineElements, LetterLineElement{
                 Token: token,
-                X:     i,
+                Column:     i,
             })
         default:
             // Any other token type closes the Beat if active
             if len(currentBeat) > 0 {
                 lineElements = append(lineElements, LetterLineElement{
                     Token:       Token{Type: "Beat", Value: "Beat"},
-                    X:           i,
+                    Column:           i,
                     SubElements: currentBeat,
                     IsBeat:      true,
                 })
@@ -74,7 +74,7 @@ func ParseLetterLine(tokens []Token) *LetterLine {
             }
             lineElements = append(lineElements, LetterLineElement{
                 Token: token,
-                X:     i,
+                Column:     i,
             })
         }
     }
@@ -83,7 +83,7 @@ func ParseLetterLine(tokens []Token) *LetterLine {
     if len(currentBeat) > 0 {
         lineElements = append(lineElements, LetterLineElement{
             Token:       Token{Type: "Beat", Value: "Beat"},
-            X:           len(tokens),
+            Column:           len(tokens),
             SubElements: currentBeat,
             IsBeat:      true,
         })
@@ -95,24 +95,6 @@ func ParseLetterLine(tokens []Token) *LetterLine {
 }
 
 
-
-
-
-
-// ✅ DisplayParseTree traverses and displays the structure of LetterLine
-func DisplayParseTree(letterLine *LetterLine) {
-    fmt.Println("=== Parse Tree Structure ===")
-    for _, element := range letterLine.Elements {
-        if element.IsBeat {
-            fmt.Println("- Beat:")
-            for _, subElement := range element.SubElements {
-                fmt.Printf("    - %s: %s\n", subElement.Token.Type, subElement.Token.Value)
-            }
-        } else {
-            fmt.Printf("- %s: %s\n", element.Token.Type, element.Token.Value)
-        }
-    }
-}
 
 
 

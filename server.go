@@ -85,10 +85,10 @@ func DisplayParagraphTree(paragraph Paragraph, indent string) {
             if element.IsBeat {
                 log.Println(indent + "  - Beat:")
                 for _, subElement := range element.SubElements {
-                    log.Printf(indent + "    - %s: %s [X=%d]\n", subElement.Token.Type, subElement.Token.Value, subElement.X)
+                    log.Printf(indent + "    - %s: %s [Column=%d]\n", subElement.Token.Type, subElement.Token.Value, subElement.Column)
                 }
             } else {
-                log.Printf(indent + "  - %s: %s [X=%d]\n", element.Token.Type, element.Token.Value, element.X)
+                log.Printf(indent + "  - %s: %s [Column=%d]\n", element.Token.Type, element.Token.Value, element.Column)
             }
         }
     }

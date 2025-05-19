@@ -22,10 +22,10 @@ const (
     HighestOctave   TokenType = "HighestOctave"   // ✅ Added
 )
 
-
-// Token represents a single unit of the notation (e.g., a pitch or a dash).
 type Token struct {
-    Type  TokenType
-    Value string
+    Type   TokenType
+    Value  string
+    Column int  // Added to track column position
 }
+
     

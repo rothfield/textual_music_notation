@@ -12,6 +12,24 @@ type Paragraph struct {
     Lyrics            []Token
 }
 
+// ✅ NewParagraph constructs a Paragraph, applies folding, and returns it.
+func NewParagraph(letterLine *LetterLine, upperAnnotations []Token, lowerAnnotations []Token, lyrics []Token) Paragraph {
+    paragraph := Paragraph{
+        LetterLine:        letterLine,
+        UpperAnnotations:  upperAnnotations,
+        LowerAnnotations:  lowerAnnotations,
+        Lyrics:            lyrics,
+    }
+    
+    // Apply the folding phase to map annotations to the LetterLine elements.
+    FoldAnnotations(&paragraph)
+
+    return paragraph
+}
+
+
+
+
 // ✅ ParseParagraph parses a single paragraph of notation into a Paragraph struct
 func ParseParagraph(para string) Paragraph {
     lines := strings.Split(para, "\n")
@@ -39,11 +57,7 @@ func ParseParagraph(para string) Paragraph {
         }
     }
 
-    return Paragraph{
-        LetterLine:        letterLine,
-        UpperAnnotations:  upperAnnotations,
-        LowerAnnotations:  lowerAnnotations,
-        Lyrics:            lyrics,
-    }
+    // ✅ Use the new constructor
+    return NewParagraph(letterLine, upperAnnotations, lowerAnnotations, lyrics)
 }
 
