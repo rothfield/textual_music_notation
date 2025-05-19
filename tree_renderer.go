@@ -3,39 +3,50 @@ package main
 import (
     "fmt"
 )
+
 // ✅ DisplayParseTree traverses and displays the structure of LetterLine
 func DisplayParseTree(letterLine *LetterLine) {
     fmt.Println("=== Parse Tree Structure ===")
     for _, element := range letterLine.Elements {
         if element.IsBeat {
+            Log("DEBUG", "Displaying Beat with %d sub-elements", len(element.SubElements))
             fmt.Println("- Beat:")
             for _, subElement := range element.SubElements {
                 fmt.Printf("    - %s: %s [Column=%d]\n", subElement.Token.Type, subElement.Token.Value, subElement.Column)
                 if subElement.Octave != 0 {
+                    Log("DEBUG", "Octave detected: %d", subElement.Octave)
                     fmt.Printf("      - Octave: %d\n", subElement.Octave)
                 }
                 if subElement.Mordent {
+                    Log("DEBUG", "Mordent detected on element: %s", subElement.Token.Value)
                     fmt.Println("      - Mordent: true")
                 }
                 if subElement.TalaMarker != "" {
+                    Log("DEBUG", "Tala Marker detected: %s", subElement.TalaMarker)
                     fmt.Printf("      - Tala: %s\n", subElement.TalaMarker)
                 }
                 if subElement.LyricText != "" {
+                    Log("DEBUG", "Lyric detected: %s", subElement.LyricText)
                     fmt.Printf("      - Lyric: %s\n", subElement.LyricText)
                 }
             }
         } else {
+            Log("DEBUG", "Displaying Top Level Element: %s", element.Token.Value)
             fmt.Printf("- %s: %s [Column=%d]\n", element.Token.Type, element.Token.Value, element.Column)
             if element.Octave != 0 {
+                Log("DEBUG", "Octave detected: %d", element.Octave)
                 fmt.Printf("  - Octave: %d\n", element.Octave)
             }
             if element.Mordent {
+                Log("DEBUG", "Mordent detected on element: %s", element.Token.Value)
                 fmt.Println("  - Mordent: true")
             }
             if element.TalaMarker != "" {
+                Log("DEBUG", "Tala Marker detected: %s", element.TalaMarker)
                 fmt.Printf("  - Tala: %s\n", element.TalaMarker)
             }
             if element.LyricText != "" {
+                Log("DEBUG", "Lyric detected: %s", element.LyricText)
                 fmt.Printf("  - Lyric: %s\n", element.LyricText)
             }
         }
@@ -59,10 +70,10 @@ func RenderParagraph(paragraph Paragraph, formatter *StringFormatter, indent str
             if element.IsBeat {
                 formatter.WriteLine(indent, "  - Beat:")
                 for _, subElement := range element.SubElements {
-                    formatter.WriteSubElement(indent, string(subElement.Token.Type), subElement.Token.Value, subElement.Column)  // Convert TokenType to string
+                    formatter.WriteSubElement(indent, string(subElement.Token.Type), subElement.Token.Value, subElement.Column, subElement.Octave, subElement.Mordent, subElement.TalaMarker, subElement.LyricText)  // Convert TokenType to string
                 }
             } else {
-                formatter.WriteElement(indent, string(element.Token.Type), element.Token.Value, element.Column)  // Convert TokenType to string
+                formatter.WriteElement(indent, string(element.Token.Type), element.Token.Value, element.Column, element.Octave, element.Mordent, element.TalaMarker, element.LyricText)  // Convert TokenType to string
             }
         }
     }
@@ -94,5 +105,4 @@ func GenerateFormattedTree(composition *Composition) string {
     }
     return formatter.Builder.String()
 }
-
 

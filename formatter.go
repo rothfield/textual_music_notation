@@ -21,12 +21,42 @@ func (sf *StringFormatter) WriteAnnotation(indent, typ, value string) {
 }
 
 // WriteElement writes an element with indentation and X position
-func (sf *StringFormatter) WriteElement(indent, typ, value string, x int) {
-    sf.Builder.WriteString(fmt.Sprintf(indent+"  - %s: %s [X=%d]\n", typ, value, x))
+func (sf *StringFormatter) WriteElement(indent, typ, value string, column int, octave int, mordent bool, talaMarker string, lyricText string) {
+    Log("DEBUG", "Formatting Element - Type: %s, Value: %s, Column: %d", typ, value, column)
+    sf.Builder.WriteString(fmt.Sprintf(indent+"  - %s: %s [Column=%d]\n", typ, value, column))
+
+    // Display additional fields if they are present
+    if octave != 0 {
+        sf.Builder.WriteString(fmt.Sprintf(indent+"    - Octave: %d\n", octave))
+    }
+    if mordent {
+        sf.Builder.WriteString(fmt.Sprintf(indent+"    - Mordent: true\n"))
+    }
+    if talaMarker != "" {
+        sf.Builder.WriteString(fmt.Sprintf(indent+"    - Tala: %s\n", talaMarker))
+    }
+    if lyricText != "" {
+        sf.Builder.WriteString(fmt.Sprintf(indent+"    - Lyric: %s\n", lyricText))
+    }
 }
 
 // WriteSubElement writes a sub-element with indentation and X position
-func (sf *StringFormatter) WriteSubElement(indent, typ, value string, x int) {
-    sf.Builder.WriteString(fmt.Sprintf(indent+"    - %s: %s [X=%d]\n", typ, value, x))
+func (sf *StringFormatter) WriteSubElement(indent, typ, value string, column int, octave int, mordent bool, talaMarker string, lyricText string) {
+    Log("DEBUG", "Formatting SubElement - Type: %s, Value: %s, Column: %d", typ, value, column)
+    sf.Builder.WriteString(fmt.Sprintf(indent+"    - %s: %s [Column=%d]\n", typ, value, column))
+
+    // Display additional fields if they are present
+    if octave != 0 {
+        sf.Builder.WriteString(fmt.Sprintf(indent+"      - Octave: %d\n", octave))
+    }
+    if mordent {
+        sf.Builder.WriteString(fmt.Sprintf(indent+"      - Mordent: true\n"))
+    }
+    if talaMarker != "" {
+        sf.Builder.WriteString(fmt.Sprintf(indent+"      - Tala: %s\n", talaMarker))
+    }
+    if lyricText != "" {
+        sf.Builder.WriteString(fmt.Sprintf(indent+"      - Lyric: %s\n", lyricText))
+    }
 }
 

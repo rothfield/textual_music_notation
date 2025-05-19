@@ -1,8 +1,9 @@
+
 package main
 
 type LetterLineElement struct {
     Token       Token
-    Column           int
+    Column      int
     SubElements []LetterLineElement
     IsBeat      bool
     Octave      int
@@ -10,7 +11,6 @@ type LetterLineElement struct {
     TalaMarker  string
     LyricText   string
 }
-
 
 // ✅ LetterLine contains all elements in a line (barlines, pitches, dashes, slurs, and beats)
 type LetterLine struct {
@@ -23,79 +23,48 @@ func ParseLetterLine(tokens []Token) *LetterLine {
     var lineElements []LetterLineElement
     var currentBeat []LetterLineElement
 
-    for i, token := range tokens {
+    currentColumn := 0
+    for _, token := range tokens {
         switch token.Type {
         case Pitch, Dash:
-            // Start or continue a Beat
+            // Part of a beat, collect in currentBeat
+            Log("DEBUG", "Adding to current beat: %s at column %d", token.Value, currentColumn)
             currentBeat = append(currentBeat, LetterLineElement{
                 Token: token,
-                Column:     i,
+                Column: currentColumn,
             })
-        case LeftSlur, RightSlur, Breath:
-            if len(currentBeat) > 0 {
-                // These are part of the Beat if it's active
-                currentBeat = append(currentBeat, LetterLineElement{
-                    Token: token,
-                    Column:     i,
-                })
-            } else {
-                // If no active Beat, they are standalone
-                lineElements = append(lineElements, LetterLineElement{
-                    Token: token,
-                    Column:     i,
-                })
-            }
+            currentColumn += len(token.Value)
         case Barline:
-            // Close the current Beat, if any
+            // Close the current beat and add its sub-elements individually
             if len(currentBeat) > 0 {
-                lineElements = append(lineElements, LetterLineElement{
-                    Token:       Token{Type: "Beat", Value: "Beat"},
-                    Column:           i,
-                    SubElements: currentBeat,
-                    IsBeat:      true,
-                })
+                Log("DEBUG", "Finalizing beat with %d elements", len(currentBeat))
+                for _, element := range currentBeat {
+                    lineElements = append(lineElements, element)
+                    Log("DEBUG", "Added element to top-level: %s at column %d", element.Token.Value, element.Column)
+                }
                 currentBeat = nil
             }
-            // Append the Barline separately
+            // Add the barline as its own top-level element
             lineElements = append(lineElements, LetterLineElement{
                 Token: token,
-                Column:     i,
+                Column: currentColumn,
             })
+            currentColumn += len(token.Value)
         default:
-            // Any other token type closes the Beat if active
-            if len(currentBeat) > 0 {
-                lineElements = append(lineElements, LetterLineElement{
-                    Token:       Token{Type: "Beat", Value: "Beat"},
-                    Column:           i,
-                    SubElements: currentBeat,
-                    IsBeat:      true,
-                })
-                currentBeat = nil
-            }
-            lineElements = append(lineElements, LetterLineElement{
-                Token: token,
-                Column:     i,
-            })
+            Log("WARN", "Unhandled token type in letter line: %s", token.Type)
         }
     }
 
-    // Final check: if there's a hanging Beat, add it
+    // If there is a remaining beat, unfold it into the top level
     if len(currentBeat) > 0 {
-        lineElements = append(lineElements, LetterLineElement{
-            Token:       Token{Type: "Beat", Value: "Beat"},
-            Column:           len(tokens),
-            SubElements: currentBeat,
-            IsBeat:      true,
-        })
+        Log("DEBUG", "Finalizing last beat with %d elements", len(currentBeat))
+        for _, element := range currentBeat {
+            lineElements = append(lineElements, element)
+            Log("DEBUG", "Added element to top-level: %s at column %d", element.Token.Value, element.Column)
+        }
     }
 
     return &LetterLine{
         Elements: lineElements,
     }
 }
-
-
-
-
-
-

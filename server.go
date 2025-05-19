@@ -34,13 +34,15 @@ func handleWebSocket(w http.ResponseWriter, r *http.Request) {
 
         // Parse the composition
         parsedOutput := ParseComposition(string(msg))
-        log.Println("Parsed composition successfully.")
+        formattedTree := GenerateFormattedTree(parsedOutput)
+	log.Println("Parsed composition successfully.")
+	log.Println("Formatted Tree:")
+	log.Println(formattedTree)
 
         // Display the parse tree with the new format
         DisplayCompositionTree(parsedOutput)
 
         // Generate the formatted tree as a string
-        formattedTree := GenerateFormattedTree(parsedOutput)
 
         // Send the formatted string instead of JSON
         err = conn.WriteMessage(websocket.TextMessage, []byte(formattedTree))
