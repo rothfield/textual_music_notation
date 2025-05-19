@@ -18,7 +18,7 @@ var (
 
 func InitLogger() {
 	var err error
-	logFile, err = os.OpenFile("application.log", os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
+	logFile, err = os.OpenFile("log/application.log", os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
 	if err != nil {
 		log.Fatal("Could not open log file: ", err)
 	}

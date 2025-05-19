@@ -1,8 +1,6 @@
 package main
 
-import (
-    "strings"
-)
+import "strings"
 
 // ✅ Composition represents the entire parsed structure
 type Composition struct {

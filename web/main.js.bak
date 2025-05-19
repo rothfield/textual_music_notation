@@ -1,20 +1,16 @@
 const socketUrl = "ws://localhost:8080/ws";
 let socket;
+let reconnectAttempts = 0;
 let lastMessage = "";
 let debounceTimeout;
 
-/**
- * ✅ Establishes the WebSocket connection and handles events
- */
 function connectWebSocket() {
     console.log("Connecting to WebSocket...");
     socket = new WebSocket(socketUrl);
 
-    /**
-     * ✅ On successful connection, reset and re-send the last message if available
-     */
     socket.onopen = function() {
         console.log("Connected to WebSocket server");
+        reconnectAttempts = 0;
         document.getElementById("connection-status").innerText = "Connected";
         document.getElementById("connection-status").style.backgroundColor = "green";
 
@@ -28,9 +24,6 @@ function connectWebSocket() {
         }
     };
 
-    /**
-     * ✅ On message received, split the sections and render appropriately
-     */
     socket.onmessage = function(event) {
         const sections = event.data.split("=== Staff Notation (SVG) ===");
         const treeAndLily = sections[0];
@@ -44,31 +37,33 @@ function connectWebSocket() {
         svgContainer.innerHTML = svgData;
     };
 
-    /**
-     * ✅ On connection close, attempt to reconnect every 30 seconds
-     */
     socket.onclose = function(event) {
         console.warn("WebSocket closed. Reason:", event.reason);
         document.getElementById("connection-status").innerText = "Disconnected";
         document.getElementById("connection-status").style.backgroundColor = "red";
 
-        console.log("Attempting to reconnect in 30 seconds...");
-        setTimeout(() => {
-            connectWebSocket();
-        }, 30000); // Retry every 30 seconds
+        const maxReconnectAttempts = 10;
+        if (reconnectAttempts < maxReconnectAttempts) {
+            const reconnectDelay = Math.min(1000 * Math.pow(2, reconnectAttempts), 30000);
+            console.log(`Attempting to reconnect in ${reconnectDelay / 1000} seconds...`);
+            setTimeout(() => {
+                reconnectAttempts++;
+                connectWebSocket();
+            }, reconnectDelay);
+        } else {
+            console.error("Max reconnect attempts reached.");
+        }
     };
 
-    /**
-     * ✅ On WebSocket error, log it to the console
-     */
     socket.onerror = function(error) {
         console.error("WebSocket error:", error);
     };
 }
 
-/**
- * ✅ Handle network events (offline and online recovery)
- */
+// Initial connection
+connectWebSocket();
+
+// Handle network events
 window.addEventListener("offline", () => {
     console.warn("You are offline. WebSocket will try to reconnect when you are back online.");
     document.getElementById("connection-status").innerText = "Offline";
@@ -80,9 +75,6 @@ window.addEventListener("online", () => {
     connectWebSocket();
 });
 
-/**
- * ✅ Handle input changes with debouncing
- */
 document.getElementById("notation-input").addEventListener("input", (event) => {
     clearTimeout(debounceTimeout);
     debounceTimeout = setTimeout(() => {
@@ -92,7 +84,4 @@ document.getElementById("notation-input").addEventListener("input", (event) => {
         }
     }, 300);
 });
-
-// ✅ Initial connection
-connectWebSocket();
 
