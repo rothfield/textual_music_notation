@@ -11,11 +11,16 @@ function connectWebSocket() {
     socket.onopen = function() {
         console.log("Connected to WebSocket server");
         reconnectAttempts = 0;
+        document.getElementById("connection-status").innerText = "Connected";
+        document.getElementById("connection-status").style.backgroundColor = "green";
 
-        // Resend the last message if there was one
+        // ✅ Resend the last message if there was one
         if (lastMessage) {
             console.log("Resending last message...");
             socket.send(lastMessage);
+
+            // Log to the console
+            console.log(`Request re-sent: ${lastMessage}`);
         }
     };
 
@@ -34,8 +39,9 @@ function connectWebSocket() {
 
     socket.onclose = function(event) {
         console.warn("WebSocket closed. Reason:", event.reason);
+        document.getElementById("connection-status").innerText = "Disconnected";
+        document.getElementById("connection-status").style.backgroundColor = "red";
 
-        // Reconnect logic with exponential backoff
         const maxReconnectAttempts = 10;
         if (reconnectAttempts < maxReconnectAttempts) {
             const reconnectDelay = Math.min(1000 * Math.pow(2, reconnectAttempts), 30000);
@@ -56,6 +62,18 @@ function connectWebSocket() {
 
 // Initial connection
 connectWebSocket();
+
+// Handle network events
+window.addEventListener("offline", () => {
+    console.warn("You are offline. WebSocket will try to reconnect when you are back online.");
+    document.getElementById("connection-status").innerText = "Offline";
+    document.getElementById("connection-status").style.backgroundColor = "orange";
+});
+
+window.addEventListener("online", () => {
+    console.log("You are back online. Attempting WebSocket reconnection...");
+    connectWebSocket();
+});
 
 document.getElementById("notation-input").addEventListener("input", (event) => {
     clearTimeout(debounceTimeout);

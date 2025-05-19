@@ -1,19 +1,19 @@
 package main
 
 import (
+    "fmt"
     "log"
     "net/http"
     "github.com/gorilla/websocket"
 )
 
 var upgrader = websocket.Upgrader{
-    CheckOrigin: func(r *http.Request) bool {
-        return true
-    },
+    ReadBufferSize:  1024,
+    WriteBufferSize: 1024,
 }
 
 func handleWebSocket(w http.ResponseWriter, r *http.Request) {
-    log.Println("WebSocket request received, upgrading the connection...")
+    upgrader.CheckOrigin = func(r *http.Request) bool { return true }
     conn, err := upgrader.Upgrade(w, r, nil)
     if err != nil {
         log.Println("WebSocket Upgrade Error:", err)
@@ -21,91 +21,38 @@ func handleWebSocket(w http.ResponseWriter, r *http.Request) {
     }
     defer conn.Close()
 
-    Log("DEBUG", "Client Connected via WebSocket")
-
     for {
-        log.Println("Waiting for message from client...")
         _, msg, err := conn.ReadMessage()
         if err != nil {
             log.Println("WebSocket Read Error:", err)
             break
         }
-        log.Printf("Message received from client: %s\n", string(msg))
 
-        // Parse the composition
-        parsedOutput := ParseComposition(string(msg))
-        log.Println("Parsed composition successfully.")
+        // ✅ Parse the composition
+        parsedComposition := ParseComposition(string(msg))
 
-        // Display the parse tree with the new format
-        DisplayCompositionTree(parsedOutput)
+        // ✅ Generate the formatted tree
+        formattedTree := GenerateFormattedTree(parsedComposition)
 
-        // Generate the formatted tree as a string
-        formattedTree := GenerateFormattedTree(parsedOutput)
+        // ✅ Console Output
+        fmt.Println("=== Parse Tree Structure ===")
+        fmt.Println(formattedTree)
 
-        // Send the formatted string instead of JSON
+        // ✅ WebSocket Output (plain string format)
         err = conn.WriteMessage(websocket.TextMessage, []byte(formattedTree))
         if err != nil {
             log.Println("WebSocket Write Error:", err)
             break
         }
-        log.Println("Message sent successfully.")
     }
-
-    log.Println("WebSocket connection closed.")
-}
-
-func serveFiles() {
-    fs := http.FileServer(http.Dir("./web"))
-    http.Handle("/", fs)
-    http.HandleFunc("/ws", handleWebSocket)
-    log.Println("Server started at http://localhost:8080")
-    log.Fatal(http.ListenAndServe(":8080", nil))
 }
 
 func main() {
-    InitLogger()
-    defer logFile.Close()
-    serveFiles()
-}
-
-// DisplayCompositionTree prints out the structure of the Composition
-func DisplayCompositionTree(composition *Composition) {
-    log.Println("Composition")
-    for i, paragraph := range composition.Paragraphs {
-        log.Printf("  Paragraph %d\n", i+1)
-        DisplayParagraphTree(paragraph, "    ")
-    }
-}
-
-// DisplayParagraphTree prints out the structure of a Paragraph
-func DisplayParagraphTree(paragraph Paragraph, indent string) {
-    log.Println(indent + "Upper Annotations")
-    for _, annotation := range paragraph.UpperAnnotations {
-        log.Printf(indent + "  - %s: %s\n", annotation.Type, annotation.Value)
-    }
-
-    log.Println(indent + "LetterLine")
-    if paragraph.LetterLine != nil {
-        for _, element := range paragraph.LetterLine.Elements {
-            if element.IsBeat {
-                log.Println(indent + "  - Beat:")
-                for _, subElement := range element.SubElements {
-                    log.Printf(indent + "    - %s: %s [X=%d]\n", subElement.Token.Type, subElement.Token.Value, subElement.X)
-                }
-            } else {
-                log.Printf(indent + "  - %s: %s [X=%d]\n", element.Token.Type, element.Token.Value, element.X)
-            }
-        }
-    }
-
-    log.Println(indent + "Lower Annotations")
-    for _, annotation := range paragraph.LowerAnnotations {
-        log.Printf(indent + "  - %s: %s\n", annotation.Type, annotation.Value)
-    }
-
-    log.Println(indent + "Lyrics")
-    for _, lyric := range paragraph.Lyrics {
-        log.Printf(indent + "  - %s: %s\n", lyric.Type, lyric.Value)
+    http.HandleFunc("/ws", handleWebSocket)
+    log.Println("Server listening on :8080")
+    err := http.ListenAndServe(":8080", nil)
+    if err != nil {
+        log.Fatal("ListenAndServe: ", err)
     }
 }
 
