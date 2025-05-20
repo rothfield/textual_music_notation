@@ -1,70 +1,99 @@
-
 package main
+
+type letterLineParser struct {
+    tokens []Token
+    pos    int
+    col    int
+}
+
+func ParseLetterLine(tokens []Token) *LetterLine {
+    parser := &letterLineParser{tokens: tokens}
+    return parser.parse()
+}
+
+func (p *letterLineParser) parse() *LetterLine {
+    var elements []LetterLineElement
+
+    for p.hasNext() {
+        tok := p.peek()
+        switch tok.Type {
+        case Pitch, Dash:
+            beat := p.parseBeat()
+            Log("DEBUG", "**parseBeat retruns, beat=%s", beat)
+
+            elements = append(elements, *beat)
+        case Barline:
+            elements = append(elements, LetterLineElement{
+                Token:  p.next(),
+                Column: p.col,
+            })
+            p.col += len(tok.Value)
+        default:
+            Log("WARN", "Unhandled token type: %s", tok.Type)
+            p.next()
+        }
+    }
+
+    return &LetterLine{Elements: elements}
+}
+
+func (p *letterLineParser) parseBeat() *LetterLineElement {
+    startCol := p.col
+    var sub []LetterLineElement
+    divisions := 0
+
+    for p.hasNext() {
+        tok := p.peek()
+        Log("DEBUG", "**In parseBeat, tok=%v", tok)
+        if tok.Type != Pitch && tok.Type != Dash {
+            break
+        }
+        sub = append(sub, LetterLineElement{
+            Token:  p.next(),
+            Column: p.col,
+        })
+        p.col += len(tok.Value)
+        divisions++
+    }
+
+    return &LetterLineElement{
+        IsBeat:      true,
+        Column:      startCol,
+        SubElements: sub,
+        Divisions:   divisions,
+    }
+}
+
+func (p *letterLineParser) hasNext() bool {
+    return p.pos < len(p.tokens)
+}
+
+func (p *letterLineParser) peek() Token {
+    if p.hasNext() {
+        return p.tokens[p.pos]
+    }
+    return Token{}
+}
+
+func (p *letterLineParser) next() Token {
+    tok := p.peek()
+    p.pos++
+    return tok
+}
 
 type LetterLineElement struct {
     Token       Token
     Column      int
     SubElements []LetterLineElement
     IsBeat      bool
+    Divisions   int // number of subdivisions if IsBeat is true
     Octave      int
     Mordent     bool
     TalaMarker  string
     LyricText   string
 }
 
-// ✅ LetterLine contains all elements in a line (barlines, pitches, dashes, slurs, and beats)
 type LetterLine struct {
     Elements []LetterLineElement
 }
 
-func ParseLetterLine(tokens []Token) *LetterLine {
-    Log("DEBUG", "ParseLetterLine")
-    Log("DEBUG", "tokens=%s", tokens)
-    var lineElements []LetterLineElement
-    var currentBeat []LetterLineElement
-
-    currentColumn := 0
-    for _, token := range tokens {
-        switch token.Type {
-        case Pitch, Dash:
-            // Part of a beat, collect in currentBeat
-            Log("DEBUG", "Adding to current beat: %s at column %d", token.Value, currentColumn)
-            currentBeat = append(currentBeat, LetterLineElement{
-                Token: token,
-                Column: currentColumn,
-            })
-            currentColumn += len(token.Value)
-        case Barline:
-            // Close the current beat and add its sub-elements individually
-            if len(currentBeat) > 0 {
-                Log("DEBUG", "Finalizing beat with %d elements", len(currentBeat))
-                for _, element := range currentBeat {
-                    lineElements = append(lineElements, element)
-                    Log("DEBUG", "Added element to top-level: %s at column %d", element.Token.Value, element.Column)
-                }
-                currentBeat = nil
-            }
-            // Add the barline as its own top-level element
-            lineElements = append(lineElements, LetterLineElement{
-                Token: token,
-                Column: currentColumn,
-            })
-            currentColumn += len(token.Value)
-        default:
-            Log("WARN", "Unhandled token type in letter line: %s", token.Type)
-        }
-    }
-
-    // If there is a remaining beat, unfold it into the top level
-    if len(currentBeat) > 0 {
-        Log("DEBUG", "Finalizing last beat with %d elements", len(currentBeat))
-        for _, element := range currentBeat {
-            lineElements = append(lineElements, element)
-            Log("DEBUG", "Added element to top-level: %s at column %d", element.Token.Value, element.Column)
-        }
-    }
-
-    return &LetterLine{
-        Elements: lineElements,
-    }
-}

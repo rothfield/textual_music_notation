@@ -1,5 +1,9 @@
 package main
 
+import( 
+	"fmt"
+)
+
 // TokenType represents different types of tokens in the notation.
 type TokenType string
 
@@ -28,4 +32,6 @@ type Token struct {
     Column int  // Added to track column position
 }
 
-    
+func (t Token) String() string {
+    return fmt.Sprintf("{%s %s %d}", t.Type, t.Value, t.Column)
+}    
