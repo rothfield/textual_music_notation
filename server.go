@@ -37,17 +37,14 @@ func handleWebSocket(w http.ResponseWriter, r *http.Request) {
         parsedOutput := ParseComposition(string(msg))
 
         // Generate the formatted tree including raw text
-        formattedTree := GenerateFormattedTree(parsedOutput)
+        //formattedTree := GenerateFormattedTree(parsedOutput)
         
-        log.Println("Parsed composition successfully.")
-        log.Println("Formatted Tree:")
-        log.Println(formattedTree)
 
         // Display the parse tree with the new format
         DisplayCompositionTree(parsedOutput)
 
         // ✅ Send the formatted string with raw text to the client
-        err = conn.WriteMessage(websocket.TextMessage, []byte(formattedTree))
+        err = conn.WriteMessage(websocket.TextMessage, []byte("hi"))
         if err != nil {
             log.Println("WebSocket Write Error:", err)
             break
