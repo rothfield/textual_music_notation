@@ -7,11 +7,15 @@ import (
 // ✅ Composition represents the entire parsed structure
 type Composition struct {
     Paragraphs []Paragraph
+    RawText    string // New field to store the raw text from the front end
 }
 
 // ✅ ParseComposition parses the input notation into a Composition structure
 func ParseComposition(input string) *Composition {
     Log("DEBUG", "ParseComposition")
+
+    // ✅ Store raw input text
+    rawText := input 
 
     // ✅ Step 1: Split by newline and trim leading/trailing blanks
     lines := strings.Split(input, "\n")
@@ -67,9 +71,10 @@ func ParseComposition(input string) *Composition {
         }
     }
 
-    // ✅ Step 6: Return the full composition structure
+    // ✅ Step 6: Return the full composition structure, including raw text
     return &Composition{
         Paragraphs: parsedParagraphs,
+        RawText:    rawText, // Attach the raw text here
     }
 }
 

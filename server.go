@@ -1,7 +1,8 @@
 package main
 
 import (
-    "log"
+    "fmt" 
+		"log"
     "net/http"
     "github.com/gorilla/websocket"
 )
@@ -34,17 +35,18 @@ func handleWebSocket(w http.ResponseWriter, r *http.Request) {
 
         // Parse the composition
         parsedOutput := ParseComposition(string(msg))
+
+        // Generate the formatted tree including raw text
         formattedTree := GenerateFormattedTree(parsedOutput)
-	log.Println("Parsed composition successfully.")
-	log.Println("Formatted Tree:")
-	log.Println(formattedTree)
+        
+        log.Println("Parsed composition successfully.")
+        log.Println("Formatted Tree:")
+        log.Println(formattedTree)
 
         // Display the parse tree with the new format
         DisplayCompositionTree(parsedOutput)
 
-        // Generate the formatted tree as a string
-
-        // Send the formatted string instead of JSON
+        // ✅ Send the formatted string with raw text to the client
         err = conn.WriteMessage(websocket.TextMessage, []byte(formattedTree))
         if err != nil {
             log.Println("WebSocket Write Error:", err)
@@ -64,36 +66,39 @@ func serveFiles() {
     log.Fatal(http.ListenAndServe(":8080", nil))
 }
 
-func main() {
-    InitLogger()
-    defer logFile.Close()
-    serveFiles()
-}
-
 // DisplayCompositionTree prints out the structure of the Composition
 func DisplayCompositionTree(composition *Composition) {
-    log.Println("Composition")
+    fmt.Println("Composition")
+    fmt.Println("  Raw Text:")
+    fmt.Println("  " + composition.RawText)
+    
     for i, paragraph := range composition.Paragraphs {
-        log.Printf("  Paragraph %d\n", i+1)
+        fmt.Printf("  Paragraph %d\n", i+1)
         DisplayParagraphTree(paragraph, "    ")
     }
 }
 
 // DisplayParagraphTree prints out the structure of a Paragraph
 func DisplayParagraphTree(paragraph Paragraph, indent string) {
-    log.Println(indent + "LetterLine")
+    fmt.Println(indent + "LetterLine")
     if paragraph.LetterLine != nil {
         for _, element := range paragraph.LetterLine.Elements {
             if element.IsBeat {
-                log.Println(indent + "  - Beat:")
+                fmt.Println(indent + "  - Beat:")
                 for _, subElement := range element.SubElements {
-                    log.Printf(indent + "    - %s: %s [Column=%d]\n", subElement.Token.Type, subElement.Token.Value, subElement.Column)
+                    fmt.Printf(indent + "    - %s: %s [Column=%d]\n", subElement.Token.Type, subElement.Token.Value, subElement.Column)
                 }
             } else {
-                log.Printf(indent + "  - %s: %s [Column=%d]\n", element.Token.Type, element.Token.Value, element.Column)
+                fmt.Printf(indent + "  - %s: %s [Column=%d]\n", element.Token.Type, element.Token.Value, element.Column)
             }
         }
     }
 }
 
+
+func main() {
+    InitLogger()
+    defer logFile.Close()
+    serveFiles()
+}
 

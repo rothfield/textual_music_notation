@@ -1,19 +1,30 @@
 package main
 
 import (
-    "fmt"  // ✅ Import the fmt package
 )
 
 func LowerAnnotationLexer(line string) []Token {
-    tokens := []Token{}
-    for _, char := range line {
+	  Log("DEBUG"," LowerAnnotationLexer line = %s", line)
+    var tokens []Token
+
+    for i, char := range line {
         switch char {
         case '.':
-            tokens = append(tokens, Token{Type: LowerOctave, Value: "."})
+            token := Token{
+                Type:   LowerOctave,
+                Value:  string(char),
+                Column: i, // ✅ Exact physical position
+            }
+            Log("DEBUG", "LowerAnnotationLexer Generated token: Type=%s, Value=%s, Column=%d", token.Type, token.Value, token.Column)
+            tokens = append(tokens, token)
         case ':':
-            tokens = append(tokens, Token{Type: LowestOctave, Value: ":"})
-        default:
-            Log("WARN", fmt.Sprintf("Unrecognized lower annotation character: %s", string(char)))
+            token := Token{
+                Type:   LowestOctave,
+                Value:  string(char),
+                Column: i, // ✅ Exact physical position
+            }
+            Log("DEBUG", "Generated token: Type=%s, Value=%s, Column=%d", token.Type, token.Value, token.Column)
+            tokens = append(tokens, token)
         }
     }
     return tokens

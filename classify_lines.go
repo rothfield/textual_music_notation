@@ -2,123 +2,192 @@ package main
 
 import (
     "strings"
-    "fmt"
 )
 
 // ✅ LineType Enum
 type LineType int
 
 const (
-    UpperAnnotationType LineType = iota
-    LetterLineType
-    LowerAnnotationType
-    LyricsType
-    UnknownLineType
+    UpperAnnotationType LineType = iota   // 0
+    LetterLineType                        // 1
+    LowerAnnotationType                   // 2
+    LyricsType                            // 3
+    UnknownLineType                       // 4
 )
 
-// ✅ ClassifyLines determines the type of each line in the paragraph
-func ClassifyLines(lines []string) map[string]LineType {
-    lineTypes := make(map[string]LineType)
+
+func findLetterLine(lines []string) int {
+    maxTokens := 0
+    letterLineIndex := -1
+
+    for i, line := range lines {
+        tokens := LetterLineLexer(line)
+
+        // ✅ Ignore lines that are just `.`, `:`, or `~`
+        if strings.TrimSpace(line) == "." || strings.TrimSpace(line) == ":" || strings.TrimSpace(line) == "~" {
+            continue
+        }
+
+        if len(tokens) > maxTokens {
+            maxTokens = len(tokens)
+            letterLineIndex = i
+        }
+    }
+
+    return letterLineIndex
+}
+
+
+func ClassifyLines(lines []string) []LineType {
+    Log("DEBUG", "ClassifyLines, lines=%s", lines)
 
     // ✅ Step 1: Remove leading and trailing blank lines
     start := 0
     end := len(lines) - 1
 
-    // Skip leading blanks
     for start < len(lines) && strings.TrimSpace(lines[start]) == "" {
         start++
     }
 
-    // Skip trailing blanks
     for end >= 0 && strings.TrimSpace(lines[end]) == "" {
         end--
     }
 
-    // If nothing remains, return empty
     if start > end {
         Log("WARN", "Empty paragraph after trimming blank lines.")
-        return lineTypes
+        return []LineType{}
     }
 
-    // ✅ Create a new trimmed slice of lines
     lines = lines[start : end+1]
+    types := make([]LineType, len(lines))
 
-    // ✅ If there is only one line, it is automatically the LetterLine
-    if len(lines) == 1 {
-        trimmedLine := strings.TrimSpace(lines[0])
-        if len(trimmedLine) > 0 {
-            lineTypes[trimmedLine] = LetterLineType
-            return lineTypes
-        }
+    // ✅ Step 2: First loop to find the LetterLine
+    letterLineIndex := findLetterLine(lines)
+
+    if letterLineIndex == -1 {
+        Log("ERROR", "No valid LetterLine found during classification.")
+        return []LineType{}
     }
 
-    // Step 2: Identify the LetterLine (contains "|")
-    letterLine := ""
-    letterLineIndex := -1
+    // ✅ Mark the LetterLine — NOTHING ELSE
+    types[letterLineIndex] = LetterLineType
 
-    for i, line := range lines {
-        trimmedLine := strings.TrimSpace(line)
+    // ✅ Step 3: Second Loop — Start from 0 again
+    foundLowerOrLyrics := false
+    foundLyrics := false
 
-        // If it contains |, prioritize this as the letter line
-        if strings.Contains(trimmedLine, "|") {
-            letterLine = trimmedLine
-            letterLineIndex = i
-            break
+    for i := 0; i < len(lines); i++ {
+			  Log("DEBUG","for loop step 3;  i=%d",i)
+				Log("DEBUG", "Types=%s",types)
+        if i == letterLineIndex {
+            continue // ✅ Skip processing the LetterLine
         }
-    }
 
-    // ✅ If no LetterLine with "|" is found, take the **longest line** with valid characters
-    if letterLine == "" {
-        validCharacters := "SrRgGmMdDnNP-"
-        for i, line := range lines {
-            trimmedLine := strings.TrimSpace(line)
-
-            // Ensure all characters are in the valid list
-            if strings.IndexFunc(trimmedLine, func(r rune) bool {
-                return !strings.ContainsRune(validCharacters, r)
-            }) == -1 {
-                if len(trimmedLine) > len(letterLine) {
-                    letterLine = trimmedLine
-                    letterLineIndex = i
+        // ✅ Upper Annotations are everything before the LetterLine
+        if i < letterLineIndex {
+            if strings.ContainsAny(lines[i], ".:~") {
+                types[i] = UpperAnnotationType
+            }
+        } else {
+            // ✅ After the LetterLine, we look for Lower or Lyrics
+            if strings.TrimSpace(lines[i]) != "" {
+                if !foundLowerOrLyrics {
+                    if strings.ContainsAny(lines[i], ".:~") {
+                        types[i] = LowerAnnotationType
+                    } else {
+                        types[i] = LyricsType
+                    }
+                    foundLowerOrLyrics = true
+                } else if !foundLyrics {
+                    types[i] = LyricsType
+                    foundLyrics = true
+                } else {
+                    Log("WARN", "Ignoring additional line at index %d", i)
                 }
             }
         }
     }
 
-    // ✅ If still no LetterLine is found, just log a warning and continue
-    if letterLine == "" {
-        Log("WARN", fmt.Sprintf("No valid LetterLine found in paragraph: %v", lines))
-        return lineTypes
+    // ✅ Log the final classification
+    for index, lineType := range types {
+        Log("DEBUG", "Line %d classified as %d", index, lineType)
     }
 
-    // Mark the LetterLine
-    lineTypes[letterLine] = LetterLineType
-
-    // Step 3: Classify lines **before** the LetterLine as Upper Annotations
-    for i := 0; i < letterLineIndex; i++ {
-        trimmedLine := strings.TrimSpace(lines[i])
-        if len(trimmedLine) > 0 {
-            lineTypes[trimmedLine] = UpperAnnotationType
-        }
-    }
-
-    // Step 4: Classify lines **after** the LetterLine
-    foundLower := false
-    for i := letterLineIndex + 1; i < len(lines); i++ {
-        trimmedLine := strings.TrimSpace(lines[i])
-        if len(trimmedLine) == 0 {
-            continue
-        }
-
-        // The first non-empty line after LetterLine is LowerAnnotation
-        if !foundLower {
-            lineTypes[trimmedLine] = LowerAnnotationType
-            foundLower = true
-        } else {
-            lineTypes[trimmedLine] = LyricsType
-        }
-    }
-
-    return lineTypes
+    Log("DEBUG", "ClassifyLines result: %v", types)
+    return types
 }
+
+func zClassifyLines(lines []string) []LineType {
+    Log("DEBUG", "ClassifyLines, lines=%s", lines)
+
+    // ✅ Step 1: Remove leading and trailing blank lines
+    start := 0
+    end := len(lines) - 1
+
+    for start < len(lines) && strings.TrimSpace(lines[start]) == "" {
+        start++
+    }
+
+    for end >= 0 && strings.TrimSpace(lines[end]) == "" {
+        end--
+    }
+
+    if start > end {
+        Log("WARN", "Empty paragraph after trimming blank lines.")
+        return []LineType{}
+    }
+
+    lines = lines[start : end+1]
+    types := make([]LineType, len(lines))
+
+    // ✅ Step 2: First loop to find the LetterLine
+    letterLineIndex := findLetterLine(lines)
+
+    if letterLineIndex == -1 {
+        Log("ERROR", "No valid LetterLine found during classification.")
+        return []LineType{}
+    }
+
+    // ✅ Mark the LetterLine
+    types[letterLineIndex] = LetterLineType
+
+    // ✅ Step 3: Second Loop — Start from 0 again
+    foundLowerOrLyrics := false
+    foundLyrics := false
+
+    for i := 0; i < len(lines); i++ {
+        if i == letterLineIndex {
+            continue // ✅ Skip processing the LetterLine
+        }
+
+        if i < letterLineIndex {
+            // ✅ Explicitly check if it is valid for UpperAnnotation
+            if strings.ContainsAny(lines[i], ".:~") {
+                types[i] = UpperAnnotationType
+            } else {
+                types[i] = UnknownLineType
+            }
+        } else if i > letterLineIndex {
+            if strings.TrimSpace(lines[i]) != "" {
+                if !foundLowerOrLyrics {
+                    if strings.ContainsAny(lines[i], ".:~") {
+                        types[i] = LowerAnnotationType
+                    } else {
+                        types[i] = LyricsType
+                    }
+                    foundLowerOrLyrics = true
+                } else if !foundLyrics {
+                    types[i] = LyricsType
+                    foundLyrics = true
+                } else {
+                    Log("WARN", "Ignoring additional line at index %d", i)
+                }
+            }
+        }
+    }
+
+    Log("DEBUG", "ClassifyLines result: %v", types)
+    return types
+}
+
 

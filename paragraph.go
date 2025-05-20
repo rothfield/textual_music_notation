@@ -27,37 +27,42 @@ func NewParagraph(letterLine *LetterLine, upperAnnotations []Token, lowerAnnotat
     return paragraph
 }
 
-
-
-
-// ✅ ParseParagraph parses a single paragraph of notation into a Paragraph struct
+// ✅ ParseParagraph integrates ClassifyLines and lexes only once
 func ParseParagraph(para string) Paragraph {
     lines := strings.Split(para, "\n")
-    lineTypes := ClassifyLines(lines)
+    classifiedTypes := ClassifyLines(lines)
 
     var letterLine *LetterLine
     var upperAnnotations []Token
     var lowerAnnotations []Token
     var lyrics []Token
+    lyricsFound := false
 
-    for _, line := range lines {
-        trimmedLine := strings.TrimSpace(line)
-        switch lineTypes[trimmedLine] {
+    // ✅ Traverse the classified lines in order
+    for index, lineType := range classifiedTypes {
+        trimmedLine := strings.TrimRight(lines[index], "\n")
+        
+        switch lineType {
         case UpperAnnotationType:
-            upperAnnotations = UpperAnnotationLexer(trimmedLine)
+            upperAnnotations = append(upperAnnotations, UpperAnnotationLexer(trimmedLine)...)
         case LetterLineType:
             tokens := LetterLineLexer(trimmedLine)
             letterLine = ParseLetterLine(tokens)
         case LowerAnnotationType:
-            lowerAnnotations = LowerAnnotationLexer(trimmedLine)
+            lowerAnnotations = append(lowerAnnotations, LowerAnnotationLexer(trimmedLine)...)
         case LyricsType:
-            lyrics = LyricsLexer(trimmedLine)
+            if !lyricsFound {
+                lyrics = append(lyrics, LyricsLexer(trimmedLine)...)
+                lyricsFound = true
+            } else {
+                Log("WARN", "Multiple lyrics lines detected. Ignoring additional ones.")
+            }
         default:
-            Log("WARN", "Unknown line type detected")
+            Log("WARN", "Unknown line type detected: %s", trimmedLine)
         }
     }
 
-    // ✅ Use the new constructor
+    // ✅ Use the new constructor to build the Paragraph
     return NewParagraph(letterLine, upperAnnotations, lowerAnnotations, lyrics)
 }
 

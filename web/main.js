@@ -55,7 +55,7 @@ function connectWebSocket() {
         console.log("Attempting to reconnect in 30 seconds...");
         setTimeout(() => {
             connectWebSocket();
-        }, 30000); // Retry every 30 seconds
+        }, 5000); // Retry every 30 seconds
     };
 
     /**
