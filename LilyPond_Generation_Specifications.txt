@@ -1,0 +1,83 @@
+
+LilyPond Generation Specifications
+----------------------------------
+
+1️⃣  Mapping of Notation to LilyPond Pitches
+-------------------------------------------
+The notation SrRgGmMPdDnN maps to the following LilyPond pitches:
+- S → c
+- r → db
+- R → d
+- g → eb
+- G → e
+- m → f
+- M → fis
+- P → g
+- d → ab
+- D → a
+- n → bb
+- N → b
+
+2️⃣  Beat and Duration Calculation
+----------------------------------
+- One Beat is exactly 1/4 of a note.
+- Durations are determined by:
+  - The number of dashes (-) extending the note within the beat.
+  - Example:
+    - S--r:
+      - S with two dashes → 3/4 of a 1/4 note → 3/16 of a whole note.
+      - r → 1/4 of a 1/4 note → 1/16 of a whole note.
+
+3️⃣  Fraction Reduction and Tuplets
+------------------------------------
+- Durations must be represented in powers of 2.
+- If the duration does not fit a power of 2, it should be wrapped in a tuplet.
+- Use /tuplet instead of \times.
+- Example:
+    - If a note is 3/16, it should be represented as:
+      \tuplet 3/2 { c8 }
+
+4️⃣  Dotted and Double-Dotted Notes
+------------------------------------
+- If a note starts at the beginning of a beat and its duration matches:
+  - Dotted (e.g., 3/8, 3/4) → Use a dotted note.
+  - Double-dotted (e.g., 7/8) → Use a double-dotted note.
+
+5️⃣  Annotation Mapping
+------------------------
+- Octaves
+  - . (Higher Octave) → c', d', etc.
+  - : (Two Octaves Higher) → c'', d'', etc.
+  - Lower octave (_) → c,, d,, etc.
+
+- Mordent
+  - If a note has a mordent, wrap it in:
+    \mordent { c }
+
+- Tala
+  - If a Tala is applied, it should be rendered as a textual marker:
+    \markup { "Tala 3" }
+
+- Lyrics
+  - Lyrics align with notes:
+    \lyricmode {
+      sa re ga ma
+    }
+
+6️⃣  Folding Phase Completeness
+-------------------------------
+- All annotations are attached during the Folding Phase.
+- When generating LilyPond, the parse tree will already have:
+  - Octave shifts
+  - Mordents
+  - Tala markers
+  - Lyrics attached to LetterLineElement.
+
+7️⃣  Generation Strategy
+-------------------------
+1. Traverse the LetterLine in the parse tree.
+2. Generate the appropriate LilyPond code:
+   - Pitches → Translated to LilyPond names.
+   - Durations → Calculated based on dashes.
+   - Octaves → Translated to ', , as needed.
+   - Annotations → Rendered inline.
