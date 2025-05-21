@@ -1,7 +1,15 @@
 package newparser
 
+import (
+    "strings"
+)
+
 type Paragraph struct {
-    LetterLine *LetterLine
+    Raw              string
+    LetterLine       *LetterLine
+    UpperAnnotations []string
+    LowerAnnotations []string
+    Lyrics           []string
 }
 
 func ParseParagraph(lines []string) *Paragraph {
@@ -9,10 +17,17 @@ func ParseParagraph(lines []string) *Paragraph {
         return nil
     }
 
+    Log("DEBUG", "ParseParagraph raw lines:\n%s", strings.Join(lines, "\n"))
+
     letter, upperLines, lowerLines, lyricLines := SplitLinesByType(lines)
     if letter == "" {
+        Log("DEBUG", "ParseParagraph aborted: no letter line found.")
         return nil
     }
+
+    Log("DEBUG", "Upper lines: %v", upperLines)
+    Log("DEBUG", "Lower lines: %v", lowerLines)
+    Log("DEBUG", "Lyric lines: %v", lyricLines)
 
     tokens := LexLetterLine(letter)
     letterLine := ParseLetterLine(letter, tokens)
@@ -29,10 +44,16 @@ func ParseParagraph(lines []string) *Paragraph {
     }
 
     paragraph := &Paragraph{
-        LetterLine: letterLine,
+        Raw:              strings.Join(lines, "\n"),
+        LetterLine:       letterLine,
+        UpperAnnotations: upperLines,
+        LowerAnnotations: lowerLines,
+        Lyrics:           lyricLines,
     }
 
+    Log("DEBUG", "Calling FoldAnnotations with %d annotations", len(annotations))
     FoldAnnotations(paragraph, annotations)
 
     return paragraph
 }
+
