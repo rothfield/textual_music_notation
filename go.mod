@@ -1,4 +1,4 @@
-module go-mod
+module textual_music_notation
 
 go 1.24.2
 
