@@ -6,9 +6,11 @@ type letterLineParser struct {
     col    int
 }
 
-func ParseLetterLine(tokens []Token) *LetterLine {
+func ParseLetterLine(raw string, tokens []Token) *LetterLine {
     parser := &letterLineParser{tokens: tokens}
-    return parser.parse()
+    line := parser.parse()
+    line.Raw = raw
+    return line
 }
 
 func (p *letterLineParser) parse() *LetterLine {
@@ -26,7 +28,6 @@ func (p *letterLineParser) parse() *LetterLine {
             })
             p.col += len(tok.Value)
         default:
-            // Skip unknown or unsupported tokens
             p.next()
         }
     }

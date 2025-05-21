@@ -1,10 +1,9 @@
-package newparser 
+package newparser
 
-import( 
-	"fmt"
+import (
+    "fmt"
 )
 
-// TokenType represents different types of tokens in the notation.
 type TokenType string
 
 const (
@@ -15,24 +14,24 @@ const (
     Slur           TokenType = "Slur"
     Barline        TokenType = "Barline"
     Breath         TokenType = "Breath"
-    Lyrics         TokenType = "Lyrics"
     Octave         TokenType = "Octave"
     Mordent        TokenType = "Mordent"
     Tala           TokenType = "Tala"
     Space          TokenType = "Space"
-    LowerOctave    TokenType = "LowerOctave"    // ✅ Added
-    LowestOctave   TokenType = "LowestOctave"   // ✅ Added
-    HigherOctave    TokenType = "HigherOctave"    // ✅ Added
-    HighestOctave   TokenType = "HighestOctave"   // ✅ Added
-		Unknown        TokenType = "Unknown"
+    LowerOctave    TokenType = "LowerOctave"
+    LowestOctave   TokenType = "LowestOctave"
+    UpperOctave    TokenType = "UperOctave"
+    HighestOctave  TokenType = "HighestOctave"
+    Syllable       TokenType = "Syllable"
+    Unknown        TokenType = "Unknown"
 )
 
 type Token struct {
     Type   TokenType
     Value  string
-    Column int  // Added to track column position
+    Column int
 }
 
 func (t Token) String() string {
     return fmt.Sprintf("{%s %s %d}", t.Type, t.Value, t.Column)
-}    
+}
