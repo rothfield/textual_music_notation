@@ -1,7 +1,6 @@
 package main
 
 import (
-    "fmt" 
 		"log"
     "net/http"
     "github.com/gorilla/websocket"
@@ -34,17 +33,12 @@ func handleWebSocket(w http.ResponseWriter, r *http.Request) {
         log.Printf("Message received from client: %s\n", string(msg))
 
         // Parse the composition
-        parsedOutput := ParseComposition(string(msg))
-
-        // Generate the formatted tree including raw text
-        //formattedTree := GenerateFormattedTree(parsedOutput)
-        
-
-        // Display the parse tree with the new format
-        DisplayCompositionTree(parsedOutput)
-
+        parsed := ParseComposition(string(msg))
+         formatter := &StringFormatter{}
+         DisplayCompositionTree(parsed, formatter)
+				 Log("DEBUG","\n%s",formatter.Builder.String())
         // ✅ Send the formatted string with raw text to the client
-        err = conn.WriteMessage(websocket.TextMessage, []byte("hi"))
+				err = conn.WriteMessage(websocket.TextMessage, []byte(formatter.Builder.String()))
         if err != nil {
             log.Println("WebSocket Write Error:", err)
             break
@@ -63,38 +57,9 @@ func serveFiles() {
     log.Fatal(http.ListenAndServe(":8080", nil))
 }
 
-// DisplayCompositionTree prints out the structure of the Composition
-func DisplayCompositionTree(composition *Composition) {
-    fmt.Println("Composition")
-    fmt.Println("  Raw Text:")
-    fmt.Println("  " + composition.RawText)
-    
-    for i, paragraph := range composition.Paragraphs {
-        fmt.Printf("  Paragraph %d\n", i+1)
-        DisplayParagraphTree(paragraph, "    ")
-    }
-}
-
-// DisplayParagraphTree prints out the structure of a Paragraph
-func DisplayParagraphTree(paragraph Paragraph, indent string) {
-    fmt.Println(indent + "LetterLine")
-    if paragraph.LetterLine != nil {
-        for _, element := range paragraph.LetterLine.Elements {
-            if element.IsBeat {
-                fmt.Println(indent + "  - Beat:")
-                for _, subElement := range element.SubElements {
-                    fmt.Printf(indent + "    - %s: %s [Column=%d]\n", subElement.Token.Type, subElement.Token.Value, subElement.Column)
-                }
-            } else {
-                fmt.Printf(indent + "  - %s: %s [Column=%d]\n", element.Token.Type, element.Token.Value, element.Column)
-            }
-        }
-    }
-}
-
-
 func main() {
     InitLogger()
+		DebugLetterLine()
     defer logFile.Close()
     serveFiles()
 }

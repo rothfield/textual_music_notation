@@ -24,6 +24,7 @@ const (
     LowestOctave   TokenType = "LowestOctave"   // ✅ Added
     HigherOctave    TokenType = "HigherOctave"    // ✅ Added
     HighestOctave   TokenType = "HighestOctave"   // ✅ Added
+		Unknown TokenType = "Unknown"
 )
 
 type Token struct {
