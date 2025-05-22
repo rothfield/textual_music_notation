@@ -48,7 +48,7 @@ func FoldAnnotations(p *Paragraph, annotations []Annotation) {
 
         Log("DEBUG", "Folding annotation %s at column %d to element at index %d (column %d)",
             ann.Type, ann.Column, best, el.Column)
-        applyAnnotation(el, ann)
+        Log("DEBUG", "Annotation %s at col %d not applied — no subelement match in beat", ann.Type, ann.Column)
     }
 }
 

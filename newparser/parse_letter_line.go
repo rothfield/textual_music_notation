@@ -49,7 +49,7 @@ func (p *letterLineParser) parseBeat() *LetterLineElement {
 
 	for p.hasNext() {
 		tok := p.peek()
-		if tok.Type != Pitch && tok.Type != Dash {
+		if !isAllowedInBeat(tok.Type) {
 			break
 		}
 		sub = append(sub, LetterLineElement{
@@ -82,3 +82,8 @@ func (p *letterLineParser) next() Token {
 	p.pos++
 	return tok
 }
+
+func isAllowedInBeat(t TokenType) bool {
+	return t == Pitch || t == Dash || t == Breath || t == LeftSlur || t == RightSlur
+}
+

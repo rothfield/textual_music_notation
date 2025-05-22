@@ -89,7 +89,7 @@ func LexLetterLine(input string) []Token {
             tokens = append(tokens, Token{Type: Dash, Value: string(char), Column: i})
         case '|':
             tokens = append(tokens, Token{Type: Barline, Value: string(char), Column: i})
-        case ',':
+        case '\'':
             tokens = append(tokens, Token{Type: Breath, Value: string(char), Column: i})
         case '(':
             tokens = append(tokens, Token{Type: LeftSlur, Value: string(char), Column: i})
