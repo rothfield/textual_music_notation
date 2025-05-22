@@ -7,9 +7,12 @@ import (
 type Paragraph struct {
     Raw              string
     LetterLine       *LetterLine
-    UpperAnnotations []string
-    LowerAnnotations []string
-    LyricLines       []string
+    UpperAnnotations [][]Annotation
+    LowerAnnotations [][]Annotation
+    LyricLines       [][]Annotation
+    RawUpperLines    []string
+    RawLowerLines    []string
+    RawLyricLines    []string
 }
 
 func ParseParagraph(lines []string) *Paragraph {
@@ -38,7 +41,12 @@ func ParseParagraph(lines []string) *Paragraph {
     Log("DEBUG", "Lexed %d tokens from letter line", len(tokens))
     letterLine := ParseLetterLine(letter, tokens)
 
-    var annotations []Annotation
+    var (
+    annotations []Annotation
+    upper       []Annotation
+    lower       []Annotation
+    syllables   []Annotation
+)
     if len(upperLines) > 0 {
         upper := LexUpperAnnotationLine(upperLines[0])
         Log("DEBUG", "Lexed %d upper annotations", len(upper))
@@ -58,9 +66,12 @@ func ParseParagraph(lines []string) *Paragraph {
     paragraph := &Paragraph{
         Raw:              strings.Join(lines, "\n"),
         LetterLine:       letterLine,
-        UpperAnnotations: upperLines,
-        LowerAnnotations: lowerLines,
-        LyricLines:       lyricLines,
+        UpperAnnotations: [][]Annotation{upper},
+        LowerAnnotations: [][]Annotation{lower},
+        LyricLines:       [][]Annotation{syllables},
+        RawUpperLines:    upperLines,
+        RawLowerLines:    lowerLines,
+        RawLyricLines:    lyricLines,
     }
 
     Log("DEBUG", "Calling FoldAnnotations with %d annotations", len(annotations))

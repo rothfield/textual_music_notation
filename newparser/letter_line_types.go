@@ -11,7 +11,7 @@ type LetterLineElement struct {
     Octave       int
     Mordent      bool
     TalaMarker   string
-		Syllables []string
+    SyllableText string
     IsBeat       bool
     SubElements  []LetterLineElement
     Divisions    int

@@ -40,24 +40,36 @@ func FormatComposition(c *Composition, formatter *StringFormatter) {
 func FormatParagraph(p *Paragraph, formatter *StringFormatter) {
 	FormatLetterLine(p.LetterLine, formatter, "  ")
 
-	if len(p.UpperAnnotations) > 0 {
+	if hasAnnotations(p.UpperAnnotations) {
 		formatter.WriteLine("  ", "Upper Annotations")
-		for _, line := range p.UpperAnnotations {
-			formatter.WriteLine("    ", line)
+		for _, anns := range p.UpperAnnotations {
+			var tokens []string
+			for _, ann := range anns {
+				tokens = append(tokens, fmt.Sprintf("[%s: %s @%d]", ann.Type, ann.Value, ann.Column))
+			}
+			formatter.WriteLine("    ", strings.Join(tokens, " "))
 		}
 	}
 
-	if len(p.LowerAnnotations) > 0 {
+	if hasAnnotations(p.LowerAnnotations) {
 		formatter.WriteLine("  ", "Lower Annotations")
-		for _, line := range p.LowerAnnotations {
-			formatter.WriteLine("    ", line)
+		for _, anns := range p.LowerAnnotations {
+			var tokens []string
+			for _, ann := range anns {
+				tokens = append(tokens, fmt.Sprintf("[%s: %s @%d]", ann.Type, ann.Value, ann.Column))
+			}
+			formatter.WriteLine("    ", strings.Join(tokens, " "))
 		}
 	}
 
-	if len(p.LyricLines) > 0 {
-		formatter.WriteLine("  ", "LyricLines")
-		for _, line := range p.LyricLines {
-			formatter.WriteLine("    ", line)
+	if hasAnnotations(p.LyricLines) {
+		formatter.WriteLine("  ", "Lyric Lines")
+		for _, anns := range p.LyricLines {
+			var tokens []string
+			for _, ann := range anns {
+				tokens = append(tokens, fmt.Sprintf("[%s: %s @%d]", ann.Type, ann.Value, ann.Column))
+			}
+			formatter.WriteLine("    ", strings.Join(tokens, " "))
 		}
 	}
 }
@@ -98,11 +110,21 @@ func writeElement(formatter *StringFormatter, indent string, el LetterLineElemen
 		if el.TalaMarker != "" {
 			parts = append(parts, fmt.Sprintf("Tala: %s", el.TalaMarker))
 		}
-		if len(el.Syllables) > 0 {
-	parts = append(parts, fmt.Sprintf("Syllables: %q", strings.Join(el.Syllables, " ")))
-}
+		if el.SyllableText != "" {
+			parts = append(parts, fmt.Sprintf("Syllable: %q", el.SyllableText))
+		}
 
 		formatter.WriteLine(indent, strings.Join(parts, ", "))
 	}
 }
 
+
+
+func hasAnnotations(groups [][]Annotation) bool {
+	for _, group := range groups {
+		if len(group) > 0 {
+			return true
+		}
+	}
+	return false
+}
