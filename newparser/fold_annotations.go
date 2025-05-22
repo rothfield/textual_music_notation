@@ -22,6 +22,37 @@ func FoldAnnotations(p *Paragraph, annotations []Annotation) {
 
 		if best == -1 {
 			Log("DEBUG", "No match found for annotation %s at column %d", ann.Type, ann.Column)
+
+			// Fallback for unmatched syllables/lyrics
+			if ann.Type == Syllable || ann.Type == Lyric {
+				var fallback *LetterLineElement
+
+				for i := len(p.LetterLine.Elements) - 1; i >= 0; i-- {
+					el := &p.LetterLine.Elements[i]
+					if el.IsBeat {
+						for j := len(el.SubElements) - 1; j >= 0; j-- {
+							sub := &el.SubElements[j]
+							if sub.Token.Type == PitchToken || sub.Token.Type == DashToken {
+								fallback = sub
+								break
+							}
+						}
+					} else if el.Token.Type == PitchToken || el.Token.Type == DashToken {
+						fallback = el
+					}
+					if fallback != nil {
+						break
+					}
+				}
+
+				if fallback != nil {
+					Log("DEBUG", "Falling back: attaching annotation %s to last pitch/dash at column %d", ann.Type, fallback.Column)
+					applyAnnotation(fallback, ann)
+				} else {
+					Log("DEBUG", "Fallback failed: no pitch or dash to attach annotation %s", ann.Type)
+				}
+			}
+
 			continue
 		}
 
@@ -53,7 +84,7 @@ func FoldAnnotations(p *Paragraph, annotations []Annotation) {
 }
 
 func applyAnnotation(el *LetterLineElement, ann Annotation) {
-		Log("DEBUG", "applyAnnotation, annotation= %s ",ann)
+	Log("DEBUG", "applyAnnotation, annotation= Type=%s, Value=%s, Column=%d", ann.Type, ann.Value, ann.Column)
 	switch ann.Type {
 	case HigherOctave:
 		el.Octave += 1
