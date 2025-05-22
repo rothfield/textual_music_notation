@@ -73,7 +73,7 @@ func ParseParagraph(lines []string) *Paragraph {
         RawLowerLines:    lowerLines,
         RawLyricLines:    lyricLines,
     }
-    Log("DEBUG", "lower line: %q", lowerLines[0])
+
     Log("DEBUG", "Calling FoldAnnotations with %d annotations", len(annotations))
     FoldAnnotations(paragraph, annotations)
 
