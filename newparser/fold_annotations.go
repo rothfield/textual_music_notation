@@ -61,7 +61,7 @@ func applyAnnotation(el *LetterLineElement, ann Annotation) {
 		el.Octave -= 1
 	case Mordent:
 		el.Mordent = true
-	case Lyric:
+	case Syllable:
 		el.Syllables = append(el.Syllables, ann.Value)
 	case TalaMarker:
 		el.TalaMarker = ann.Value

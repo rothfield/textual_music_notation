@@ -23,7 +23,6 @@ const (
     Mordent        TokenType = "Mordent"      // ~
     Tala           TokenType = "Tala"
     TalaMarker     TokenType = "TalaMarker"
-    Lyric          TokenType = "Lyric"
     Syllable       TokenType = "Syllable"
     UpperOctave    TokenType = "UpperOctave"
 )
