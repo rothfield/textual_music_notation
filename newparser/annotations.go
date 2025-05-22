@@ -21,7 +21,7 @@ func LexAnnotationLine(line string, role AnnotationRole) []Annotation {
     case LowerLine:
         return LexLowerAnnotationLine(line)
     case SyllableLine:
-        return LexSyllableAnnotationLine(line)
+        return LexLyricsAnnotationLine(line)
     default:
         return nil
     }

@@ -9,7 +9,7 @@ type Paragraph struct {
     LetterLine       *LetterLine
     UpperAnnotations []string
     LowerAnnotations []string
-    LyricLines           []string
+    LyricLines       []string
 }
 
 func ParseParagraph(lines []string) *Paragraph {
@@ -19,11 +19,12 @@ func ParseParagraph(lines []string) *Paragraph {
 
     Log("DEBUG", "ParseParagraph raw lines:\n%s", strings.Join(lines, "\n"))
 
-		split := SplitLinesByType(lines)
-letter := split.LetterLine
-upperLines := split.UpperAnnotations
-lowerLines := split.LowerAnnotations
-syllableLines := split.LyricLines
+    split := SplitLinesByType(lines)
+    letter := split.LetterLine
+    upperLines := split.UpperAnnotations
+    lowerLines := split.LowerAnnotations
+    lyricLines := split.LyricLines
+
     if letter == "" {
         Log("DEBUG", "ParseParagraph aborted: no letter line found.")
         return nil
@@ -31,7 +32,7 @@ syllableLines := split.LyricLines
 
     Log("DEBUG", "Upper lines: %v", upperLines)
     Log("DEBUG", "Lower lines: %v", lowerLines)
-    Log("DEBUG", "Syllable lines: %v", syllableLines)
+    Log("DEBUG", "Lyric lines: %v", lyricLines)
 
     tokens := LexLetterLine(letter)
     Log("DEBUG", "Lexed %d tokens from letter line", len(tokens))
@@ -39,17 +40,17 @@ syllableLines := split.LyricLines
 
     var annotations []Annotation
     if len(upperLines) > 0 {
-        upper := LexAnnotationLine(upperLines[0], UpperLine)
+        upper := LexUpperAnnotationLine(upperLines[0])
         Log("DEBUG", "Lexed %d upper annotations", len(upper))
         annotations = append(annotations, upper...)
     }
     if len(lowerLines) > 0 {
-        lower := LexAnnotationLine(lowerLines[0], LowerLine)
+        lower := LexLowerAnnotationLine(lowerLines[0])
         Log("DEBUG", "Lexed %d lower annotations", len(lower))
         annotations = append(annotations, lower...)
     }
-    if len(syllableLines) > 0 {
-        syllables := LexAnnotationLine(syllableLines[0], SyllableLine)
+    if len(lyricLines) > 0 {
+        syllables := LexLyricsAnnotationLine(lyricLines[0])
         Log("DEBUG", "Lexed %d syllable annotations", len(syllables))
         annotations = append(annotations, syllables...)
     }
@@ -59,7 +60,7 @@ syllableLines := split.LyricLines
         LetterLine:       letterLine,
         UpperAnnotations: upperLines,
         LowerAnnotations: lowerLines,
-        LyricLines:           syllableLines,
+        LyricLines:       lyricLines,
     }
 
     Log("DEBUG", "Calling FoldAnnotations with %d annotations", len(annotations))
@@ -67,3 +68,4 @@ syllableLines := split.LyricLines
 
     return paragraph
 }
+
