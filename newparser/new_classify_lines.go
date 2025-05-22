@@ -3,6 +3,7 @@ package newparser
 import (
     "strings"
 )
+
 var lineTypeNames = map[LineType]string{
     LetterLineType:      "LetterLine",
     UpperAnnotationType: "UpperAnnotation",
@@ -15,7 +16,8 @@ func findLetterLine(lines []string) int {
     letterLineIndex := -1
 
     for i, line := range lines {
-        tokens := LexLetterLine(line) // Use the existing lexer
+        tokens := LexLetterLine(line)
+        Log("DEBUG", "findLetterLine: line %d => %d tokens", i, len(tokens))
 
         if strings.TrimSpace(line) == "." || strings.TrimSpace(line) == ":" || strings.TrimSpace(line) == "~" {
             continue
@@ -27,6 +29,7 @@ func findLetterLine(lines []string) int {
         }
     }
 
+    Log("DEBUG", "Letter line identified at index %d", letterLineIndex)
     return letterLineIndex
 }
 
@@ -91,7 +94,7 @@ func ClassifyLines(lines []string) []LineType {
     }
 
     for index, lineType := range types {
-			Log("DEBUG", "Line %d classified as %s", index, lineTypeNames[lineType])
+        Log("DEBUG", "Line %d classified as %s", index, lineTypeNames[lineType])
     }
 
     Log("DEBUG", "ClassifyLines result: %s", types)

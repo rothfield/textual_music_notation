@@ -19,7 +19,11 @@ func ParseParagraph(lines []string) *Paragraph {
 
     Log("DEBUG", "ParseParagraph raw lines:\n%s", strings.Join(lines, "\n"))
 
-    letter, upperLines, lowerLines, lyricLines := SplitLinesByType(lines)
+		split := SplitLinesByType(lines)
+letter := split.LetterLine
+upperLines := split.UpperAnnotations
+lowerLines := split.LowerAnnotations
+lyricLines := split.Lyrics
     if letter == "" {
         Log("DEBUG", "ParseParagraph aborted: no letter line found.")
         return nil
@@ -30,17 +34,24 @@ func ParseParagraph(lines []string) *Paragraph {
     Log("DEBUG", "Lyric lines: %v", lyricLines)
 
     tokens := LexLetterLine(letter)
+    Log("DEBUG", "Lexed %d tokens from letter line", len(tokens))
     letterLine := ParseLetterLine(letter, tokens)
 
     var annotations []Annotation
     if len(upperLines) > 0 {
-        annotations = append(annotations, LexAnnotationLine(upperLines[0], UpperLine)...)
+        upper := LexAnnotationLine(upperLines[0], UpperLine)
+        Log("DEBUG", "Lexed %d upper annotations", len(upper))
+        annotations = append(annotations, upper...)
     }
     if len(lowerLines) > 0 {
-        annotations = append(annotations, LexAnnotationLine(lowerLines[0], LowerLine)...)
+        lower := LexAnnotationLine(lowerLines[0], LowerLine)
+        Log("DEBUG", "Lexed %d lower annotations", len(lower))
+        annotations = append(annotations, lower...)
     }
     if len(lyricLines) > 0 {
-        annotations = append(annotations, LexAnnotationLine(lyricLines[0], SyllableLine)...)
+        syllables := LexAnnotationLine(lyricLines[0], SyllableLine)
+        Log("DEBUG", "Lexed %d lyric annotations", len(syllables))
+        annotations = append(annotations, syllables...)
     }
 
     paragraph := &Paragraph{
@@ -56,4 +67,3 @@ func ParseParagraph(lines []string) *Paragraph {
 
     return paragraph
 }
-
