@@ -4,7 +4,7 @@ type SplitLines struct {
     LetterLine       string
     UpperAnnotations []string
     LowerAnnotations []string
-    Lyrics           []string
+    Syllables           []string
 }
 
 func SplitLinesByType(lines []string) SplitLines {
@@ -21,7 +21,7 @@ func SplitLinesByType(lines []string) SplitLines {
         case LowerAnnotationType:
             result.LowerAnnotations = append(result.LowerAnnotations, lines[i])
         case SyllableType:
-            result.Lyrics = append(result.Lyrics, lines[i])
+            result.Syllables = append(result.Syllables, lines[i])
         }
     }
 

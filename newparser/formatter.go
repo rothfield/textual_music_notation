@@ -54,9 +54,9 @@ func FormatParagraph(p *Paragraph, formatter *StringFormatter) {
 		}
 	}
 
-	if len(p.Lyrics) > 0 {
-		formatter.WriteLine("  ", "Lyrics")
-		for _, line := range p.Lyrics {
+	if len(p.Syllables) > 0 {
+		formatter.WriteLine("  ", "Syllables")
+		for _, line := range p.Syllables {
 			formatter.WriteLine("    ", line)
 		}
 	}
@@ -99,7 +99,7 @@ func writeElement(formatter *StringFormatter, indent string, el LetterLineElemen
 			parts = append(parts, fmt.Sprintf("Tala: %s", el.TalaMarker))
 		}
 		if el.SyllableText != "" {
-			parts = append(parts, fmt.Sprintf("Lyric: %q", el.SyllableText))
+			parts = append(parts, fmt.Sprintf("Syllable: %q", el.SyllableText))
 		}
 
 		formatter.WriteLine(indent, strings.Join(parts, ", "))

@@ -9,7 +9,7 @@ type Paragraph struct {
     LetterLine       *LetterLine
     UpperAnnotations []string
     LowerAnnotations []string
-    Lyrics           []string
+    Syllables           []string
 }
 
 func ParseParagraph(lines []string) *Paragraph {
@@ -23,7 +23,7 @@ func ParseParagraph(lines []string) *Paragraph {
 letter := split.LetterLine
 upperLines := split.UpperAnnotations
 lowerLines := split.LowerAnnotations
-lyricLines := split.Lyrics
+syllableLines := split.Syllables
     if letter == "" {
         Log("DEBUG", "ParseParagraph aborted: no letter line found.")
         return nil
@@ -31,7 +31,7 @@ lyricLines := split.Lyrics
 
     Log("DEBUG", "Upper lines: %v", upperLines)
     Log("DEBUG", "Lower lines: %v", lowerLines)
-    Log("DEBUG", "Lyric lines: %v", lyricLines)
+    Log("DEBUG", "Syllable lines: %v", syllableLines)
 
     tokens := LexLetterLine(letter)
     Log("DEBUG", "Lexed %d tokens from letter line", len(tokens))
@@ -48,9 +48,9 @@ lyricLines := split.Lyrics
         Log("DEBUG", "Lexed %d lower annotations", len(lower))
         annotations = append(annotations, lower...)
     }
-    if len(lyricLines) > 0 {
-        syllables := LexAnnotationLine(lyricLines[0], SyllableLine)
-        Log("DEBUG", "Lexed %d lyric annotations", len(syllables))
+    if len(syllableLines) > 0 {
+        syllables := LexAnnotationLine(syllableLines[0], SyllableLine)
+        Log("DEBUG", "Lexed %d syllable annotations", len(syllables))
         annotations = append(annotations, syllables...)
     }
 
@@ -59,7 +59,7 @@ lyricLines := split.Lyrics
         LetterLine:       letterLine,
         UpperAnnotations: upperLines,
         LowerAnnotations: lowerLines,
-        Lyrics:           lyricLines,
+        Syllables:           syllableLines,
     }
 
     Log("DEBUG", "Calling FoldAnnotations with %d annotations", len(annotations))
