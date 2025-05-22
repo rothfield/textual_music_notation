@@ -17,11 +17,6 @@ type LetterLineElement struct {
     Divisions    int
 }
 
-type LetterLineItem interface {
-    GetColumn() int
-    GetType() TokenType
-}
-
 func (t Token) GetColumn() int {
     return t.Column
 }
