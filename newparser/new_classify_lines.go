@@ -5,6 +5,7 @@ import (
 )
 
 var lineTypeNames = map[LineType]string{
+    UnknownLineType:     "Unknown",
     LetterLineType:      "LetterLine",
     UpperAnnotationType: "UpperAnnotation",
     LowerAnnotationType: "LowerAnnotation",
@@ -20,6 +21,19 @@ func findLetterLine(lines []string) int {
         Log("DEBUG", "findLetterLine: line %d => %d tokens", i, len(tokens))
 
         if strings.TrimSpace(line) == "." || strings.TrimSpace(line) == ":" || strings.TrimSpace(line) == "~" {
+            continue
+        }
+
+        // Count Unknown tokens
+        unknowns := 0
+        for _, tok := range tokens {
+            if tok.Type == Unknown {
+                unknowns++
+            }
+        }
+
+        // Skip lines with more than 1 unknown token
+        if unknowns > 1 {
             continue
         }
 
@@ -52,6 +66,9 @@ func ClassifyLines(lines []string) []LineType {
 
     lines = lines[start : end+1]
     types := make([]LineType, len(lines))
+    for i := range types {
+        types[i] = UnknownLineType
+    }
 
     letterLineIndex := findLetterLine(lines)
     if letterLineIndex == -1 {
@@ -67,6 +84,10 @@ func ClassifyLines(lines []string) []LineType {
         Log("DEBUG", "for loop step 3;  i=%d", i)
         Log("DEBUG", "Types=%s", types)
         if i == letterLineIndex {
+            continue
+        }
+
+        if types[i] != UnknownLineType {
             continue
         }
 
@@ -100,3 +121,4 @@ func ClassifyLines(lines []string) []LineType {
     Log("DEBUG", "ClassifyLines result: %s", types)
     return types
 }
+

@@ -3,8 +3,10 @@ package newparser
 type LineType int
 
 const (
-    LetterLineType LineType = iota
+    UnknownLineType LineType = -1
+    LetterLineType  LineType = iota
     UpperAnnotationType
     LowerAnnotationType
     SyllableType
 )
+
