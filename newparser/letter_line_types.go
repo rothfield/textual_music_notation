@@ -10,8 +10,8 @@ type LetterLineElement struct {
     Column       int
     Octave       int
     Mordent      bool
-    TalaMarker   string
-    SyllableText string
+    Tala   string
+		Syllables []string
     IsBeat       bool
     SubElements  []LetterLineElement
     Divisions    int

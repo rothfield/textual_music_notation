@@ -107,11 +107,11 @@ func writeElement(formatter *StringFormatter, indent string, el LetterLineElemen
 		if el.Mordent {
 			parts = append(parts, "Mordent: true")
 		}
-		if el.TalaMarker != "" {
-			parts = append(parts, fmt.Sprintf("Tala: %s", el.TalaMarker))
+		if el.Tala != "" {
+			parts = append(parts, fmt.Sprintf("Tala: %s", el.Tala))
 		}
-		if el.SyllableText != "" {
-			parts = append(parts, fmt.Sprintf("Syllable: %q", el.SyllableText))
+		if el.Syllables != "" {
+			parts = append(parts, fmt.Sprintf("Syllable: %q", el.Syllables))
 		}
 
 		formatter.WriteLine(indent, strings.Join(parts, ", "))

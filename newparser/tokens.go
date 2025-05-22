@@ -20,7 +20,7 @@ const (
     Space          TokenType = "Space"
     LowerOctave    TokenType = "LowerOctave"
     LowestOctave   TokenType = "LowestOctave"
-    UpperOctave    TokenType = "UperOctave"
+    UpperOctave    TokenType = "UpperOctave"
     HighestOctave  TokenType = "HighestOctave"
     Syllable       TokenType = "Syllable"
     Unknown        TokenType = "Unknown"
