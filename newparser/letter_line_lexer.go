@@ -7,7 +7,7 @@ func LexLetterLine(input string) []Token {
 
         // Check for 4-character barline
         if i+3 < len(input) && input[i:i+4] == ":||:" {
-            tokens = append(tokens, Token{Type: Barline, Value: ":||:", Column: i})
+            tokens = append(tokens, Token{Type: BarlineToken, Value: ":||:", Column: i})
             i += 4
             continue
         }
@@ -17,39 +17,39 @@ func LexLetterLine(input string) []Token {
             pair := input[i:i+2]
             switch pair {
             case ".|":
-                tokens = append(tokens, Token{Type: Barline, Value: ".|", Column: i})
+                tokens = append(tokens, Token{Type: BarlineToken, Value: ".|", Column: i})
                 i += 2
                 continue
             case ":|":
-                tokens = append(tokens, Token{Type: Barline, Value: ":|", Column: i})
+                tokens = append(tokens, Token{Type: BarlineToken, Value: ":|", Column: i})
                 i += 2
                 continue
             case ":|:":
-                tokens = append(tokens, Token{Type: Barline, Value: ":|:", Column: i})
+                tokens = append(tokens, Token{Type: BarlineToken, Value: ":|:", Column: i})
                 i += 2
                 continue
             case ":||:":
-                tokens = append(tokens, Token{Type: Barline, Value: ":||:", Column: i})
+                tokens = append(tokens, Token{Type: BarlineToken, Value: ":||:", Column: i})
                 i += 2
                 continue
             case "[|":
-                tokens = append(tokens, Token{Type: Barline, Value: "[|", Column: i})
+                tokens = append(tokens, Token{Type: BarlineToken, Value: "[|", Column: i})
                 i += 2
                 continue
             case "|.":
-                tokens = append(tokens, Token{Type: Barline, Value: "|.", Column: i})
+                tokens = append(tokens, Token{Type: BarlineToken, Value: "|.", Column: i})
                 i += 2
                 continue
             case "|:":
-                tokens = append(tokens, Token{Type: Barline, Value: "|:", Column: i})
+                tokens = append(tokens, Token{Type: BarlineToken, Value: "|:", Column: i})
                 i += 2
                 continue
             case "|]":
-                tokens = append(tokens, Token{Type: Barline, Value: "|]", Column: i})
+                tokens = append(tokens, Token{Type: BarlineToken, Value: "|]", Column: i})
                 i += 2
                 continue
             case "||":
-                tokens = append(tokens, Token{Type: Barline, Value: "||", Column: i})
+                tokens = append(tokens, Token{Type: BarlineToken, Value: "||", Column: i})
                 i += 2
                 continue
             }
@@ -57,40 +57,40 @@ func LexLetterLine(input string) []Token {
 
         // Check for multi-char pitches
         if i+1 < len(input) && input[i:i+2] == "P#" {
-            tokens = append(tokens, Token{Type: Pitch, Value: "P#", Column: i})
+            tokens = append(tokens, Token{Type: PitchToken, Value: "P#", Column: i})
             i += 2
             continue
         }
         if i+1 < len(input) && input[i:i+2] == "D#" {
-            tokens = append(tokens, Token{Type: Pitch, Value: "D#", Column: i})
+            tokens = append(tokens, Token{Type: PitchToken, Value: "D#", Column: i})
             i += 2
             continue
         }
         if i+1 < len(input) && input[i:i+2] == "R#" {
-            tokens = append(tokens, Token{Type: Pitch, Value: "R#", Column: i})
+            tokens = append(tokens, Token{Type: PitchToken, Value: "R#", Column: i})
             i += 2
             continue
         }
         if i+1 < len(input) && input[i:i+2] == "S#" {
-            tokens = append(tokens, Token{Type: Pitch, Value: "S#", Column: i})
+            tokens = append(tokens, Token{Type: PitchToken, Value: "S#", Column: i})
             i += 2
             continue
         }
         if i+1 < len(input) && input[i:i+2] == "Gb" {
-            tokens = append(tokens, Token{Type: Pitch, Value: "Gb", Column: i})
+            tokens = append(tokens, Token{Type: PitchToken, Value: "Gb", Column: i})
             i += 2
             continue
         }
         char := input[i]
         switch char {
         case 'S', 'r', 'R', 'g', 'G', 'm', 'M', 'd', 'D', 'n', 'N':
-            tokens = append(tokens, Token{Type: Pitch, Value: string(char), Column: i})
+            tokens = append(tokens, Token{Type: PitchToken, Value: string(char), Column: i})
         case '-':
-            tokens = append(tokens, Token{Type: Dash, Value: string(char), Column: i})
+            tokens = append(tokens, Token{Type: DashToken, Value: string(char), Column: i})
         case '|':
-            tokens = append(tokens, Token{Type: Barline, Value: string(char), Column: i})
+            tokens = append(tokens, Token{Type: BarlineToken, Value: string(char), Column: i})
         case '\'':
-            tokens = append(tokens, Token{Type: Breath, Value: string(char), Column: i})
+            tokens = append(tokens, Token{Type: BreathToken, Value: string(char), Column: i})
         case '(':
             tokens = append(tokens, Token{Type: LeftSlur, Value: string(char), Column: i})
         case ')':

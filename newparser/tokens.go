@@ -1,37 +1,36 @@
 package newparser
 
-import (
-    "fmt"
-)
-
 type TokenType string
 
 const (
-    Pitch          TokenType = "Pitch"
-    Dash           TokenType = "Dash"
+    // Structural tokens (renamed to avoid struct conflict)
+    PitchToken     TokenType = "Pitch"
+    DashToken      TokenType = "Dash"
+    BarlineToken   TokenType = "Barline"
+    BreathToken    TokenType = "Breath"
+    PhraseToken    TokenType = "Phrase"
+
+    // System tokens (unchanged)
     LeftSlur       TokenType = "LeftSlur"
     RightSlur      TokenType = "RightSlur"
-    Slur           TokenType = "Slur"
-    Barline        TokenType = "Barline"
-    Breath         TokenType = "Breath"
-    Octave         TokenType = "Octave"
-    Mordent        TokenType = "Mordent"
-    Tala           TokenType = "Tala"
-    Space          TokenType = "Space"
-    LowerOctave    TokenType = "LowerOctave"
-    LowestOctave   TokenType = "LowestOctave"
-    UpperOctave    TokenType = "UperOctave"
-    HighestOctave  TokenType = "HighestOctave"
-    Syllable       TokenType = "Syllable"
+    Whitespace     TokenType = "Whitespace"
+    Error          TokenType = "Error"
     Unknown        TokenType = "Unknown"
+
+    // Annotation tokens (unchanged)
+    HigherOctave   TokenType = "HigherOctave" // :
+    LowerOctave    TokenType = "LowerOctave"  // .
+    Mordent        TokenType = "Mordent"      // ~
+    Tala           TokenType = "Tala"
+    TalaMarker     TokenType = "TalaMarker"
+    Lyric          TokenType = "Lyric"
+    Syllable       TokenType = "Syllable"
+    UpperOctave    TokenType = "UpperOctave"
 )
 
 type Token struct {
-    Type   TokenType
-    Value  string
-    Column int
+	Type   TokenType
+	Value  string
+	Column int
 }
 
-func (t Token) String() string {
-    return fmt.Sprintf("{%s %s %d}", t.Type, t.Value, t.Column)
-}
