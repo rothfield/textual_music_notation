@@ -54,9 +54,9 @@ func FormatParagraph(p *Paragraph, formatter *StringFormatter) {
 		}
 	}
 
-	if len(p.Syllables) > 0 {
-		formatter.WriteLine("  ", "Syllables")
-		for _, line := range p.Syllables {
+	if len(p.LyricLines) > 0 {
+		formatter.WriteLine("  ", "LyricLines")
+		for _, line := range p.LyricLines {
 			formatter.WriteLine("    ", line)
 		}
 	}

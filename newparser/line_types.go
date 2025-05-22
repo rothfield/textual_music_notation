@@ -7,6 +7,6 @@ const (
     LetterLineType  LineType = iota
     UpperAnnotationType
     LowerAnnotationType
-    SyllableType
+    LyricLineType
 )
 

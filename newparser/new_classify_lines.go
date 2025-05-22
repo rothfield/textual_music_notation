@@ -9,7 +9,7 @@ var lineTypeNames = map[LineType]string{
     LetterLineType:      "LetterLine",
     UpperAnnotationType: "UpperAnnotation",
     LowerAnnotationType: "LowerAnnotation",
-    SyllableType:        "Syllable",
+    LyricLineType:        "LyricLine",
 }
 
 func findLetterLine(lines []string) int {
@@ -77,8 +77,8 @@ func ClassifyLines(lines []string) []LineType {
     }
     types[letterLineIndex] = LetterLineType
 
-    foundLowerOrSyllable := false
-    foundSyllable := false
+    foundLowerOrLyric := false
+    foundLyric := false
 
     for i := 0; i < len(lines); i++ {
         Log("DEBUG", "for loop step 3;  i=%d", i)
@@ -97,16 +97,16 @@ func ClassifyLines(lines []string) []LineType {
             }
         } else {
             if strings.TrimSpace(lines[i]) != "" {
-                if !foundLowerOrSyllable {
+                if !foundLowerOrLyric {
                     if strings.ContainsAny(lines[i], ".:~") {
                         types[i] = LowerAnnotationType
                     } else {
-                        types[i] = SyllableType
+                        types[i] = LyricLineType
                     }
-                    foundLowerOrSyllable = true
-                } else if !foundSyllable {
-                    types[i] = SyllableType
-                    foundSyllable = true
+                    foundLowerOrLyric = true
+                } else if !foundLyric {
+                    types[i] = LyricLineType
+                    foundLyric = true
                 } else {
                     Log("WARN", "Ignoring additional line at index %d", i)
                 }
