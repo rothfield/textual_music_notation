@@ -1,21 +1,5 @@
 package newparser
 
-func fallbackToLastPitch(line *LetterLine, ann Annotation) *LetterLineElement {
-	for i := len(line.Elements) - 1; i >= 0; i-- {
-		beat := &line.Elements[i]
-		if beat.IsBeat {
-			for j := len(beat.SubElements) - 1; j >= 0; j-- {
-				sub := &beat.SubElements[j]
-				if sub.Token.Type == Pitch {
-					Log("DEBUG", "Fallback: attaching annotation %s to last pitch at column %d", ann.Type, sub.Column)
-					return sub
-				}
-			}
-		}
-	}
-	return nil
-}
-
 func FoldAnnotations(p *Paragraph, annotations []Annotation) {
     if p == nil || p.LetterLine == nil {
         Log("DEBUG", "FoldAnnotations skipped: nil paragraph or letter line")
@@ -90,3 +74,21 @@ func abs(x int) int {
     return x
 }
 
+
+
+func fallbackToLastPitch(line *LetterLine, ann Annotation) *LetterLineElement {
+	for i := len(line.Elements) - 1; i >= 0; i-- {
+		beat := &line.Elements[i]
+		if beat.IsBeat {
+			for j := len(beat.SubElements) - 1; j >= 0; j-- {
+				sub := &beat.SubElements[j]
+				if sub.Token.Type == Pitch {
+					Log("DEBUG", "Fallback: attaching annotation %s to last pitch at column %d", ann.Type, sub.Column)
+					return sub
+				}
+			}
+		}
+	}
+	Log("DEBUG", "Fallback failed: no pitch found for annotation %s", ann.Type)
+	return nil
+}
