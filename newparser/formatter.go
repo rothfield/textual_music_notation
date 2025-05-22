@@ -98,9 +98,9 @@ func writeElement(formatter *StringFormatter, indent string, el LetterLineElemen
 		if el.TalaMarker != "" {
 			parts = append(parts, fmt.Sprintf("Tala: %s", el.TalaMarker))
 		}
-		if el.SyllableText != "" {
-			parts = append(parts, fmt.Sprintf("Syllable: %q", el.SyllableText))
-		}
+		if len(el.Syllables) > 0 {
+	parts = append(parts, fmt.Sprintf("Syllables: %q", strings.Join(el.Syllables, " ")))
+}
 
 		formatter.WriteLine(indent, strings.Join(parts, ", "))
 	}

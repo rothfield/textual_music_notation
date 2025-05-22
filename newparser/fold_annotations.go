@@ -53,6 +53,7 @@ func FoldAnnotations(p *Paragraph, annotations []Annotation) {
 }
 
 func applyAnnotation(el *LetterLineElement, ann Annotation) {
+		Log("DEBUG", "applyAnnotation, annotation= %s ",ann)
 	switch ann.Type {
 	case HigherOctave:
 		el.Octave += 1
@@ -61,7 +62,7 @@ func applyAnnotation(el *LetterLineElement, ann Annotation) {
 	case Mordent:
 		el.Mordent = true
 	case Lyric:
-		el.SyllableText = ann.Value
+		el.Syllables = append(el.Syllables, ann.Value)
 	case TalaMarker:
 		el.TalaMarker = ann.Value
 	}
