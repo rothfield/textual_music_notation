@@ -25,7 +25,7 @@ func FoldAnnotations(p *Paragraph, annotations []Annotation) {
 
 			if ann.Type == Syllable {
 				if el := fallbackToLastPitch(p.LetterLine, ann); el != nil {
-					applyAnnotation(el, ann)
+					applyFallbackAnnotation(el, ann)
 				}
 			}
 
@@ -69,7 +69,7 @@ func applyAnnotation(el *LetterLineElement, ann Annotation) {
 	case Mordent:
 		el.Mordent = true
 	case Syllable:
-		el.Syllables = append(el.Syllables, ann.Value)
+		el.Syllable = ann.Value
 	case Tala:
 		el.Tala = ann.Value
 	}
@@ -99,3 +99,9 @@ func abs(x int) int {
 	return x
 }
 
+
+
+func applyFallbackAnnotation(el *LetterLineElement, ann Annotation) {
+	Log("DEBUG", "applyFallbackAnnotation: %s -> ExtraSyllables", ann.Value)
+	el.ExtraSyllables = append(el.ExtraSyllables, ann.Value)
+}
