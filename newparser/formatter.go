@@ -5,21 +5,26 @@ import (
 	"fmt"
 )
 
+// StringFormatter helps build a structured and indented string output.
+// It wraps strings.Builder with convenience methods for writing lines.
 type StringFormatter struct {
 	Builder strings.Builder
 }
 
+// WriteLine writes a single line with optional indentation.
 func (f *StringFormatter) WriteLine(indent, text string) {
 	f.Builder.WriteString(indent + text + "\n")
 }
 
+// WriteLines writes multiple lines, each with the same indentation.
 func (f *StringFormatter) WriteLines(indent string, lines []string) {
 	for _, line := range lines {
 		f.WriteLine(indent, line)
 	}
 }
 
-func RenderComposition(c *Composition, formatter *StringFormatter) {
+// FormatComposition displays a complete composition: raw text and paragraphs.
+func FormatComposition(c *Composition, formatter *StringFormatter) {
 	formatter.WriteLine("", "=== Raw Notation ===")
 	formatter.WriteLines("", strings.Split(c.RawText, "\n"))
 	formatter.WriteLine("", "====================")
@@ -27,12 +32,13 @@ func RenderComposition(c *Composition, formatter *StringFormatter) {
 	formatter.WriteLine("", "Composition")
 	for i, p := range c.Paragraphs {
 		formatter.WriteLine("", fmt.Sprintf("  Paragraph %d", i+1))
-		RenderParagraph(p, formatter)
+		FormatParagraph(p, formatter)
 	}
 }
 
-func RenderParagraph(p *Paragraph, formatter *StringFormatter) {
-	RenderLetterLine(p.LetterLine, formatter, "  ")
+// FormatParagraph displays the letter line and any associated annotations.
+func FormatParagraph(p *Paragraph, formatter *StringFormatter) {
+	FormatLetterLine(p.LetterLine, formatter, "  ")
 
 	if len(p.UpperAnnotations) > 0 {
 		formatter.WriteLine("  ", "Upper Annotations")
@@ -56,7 +62,8 @@ func RenderParagraph(p *Paragraph, formatter *StringFormatter) {
 	}
 }
 
-func RenderLetterLine(l *LetterLine, formatter *StringFormatter, indent string) {
+// FormatLetterLine shows the raw and parsed contents of a LetterLine.
+func FormatLetterLine(l *LetterLine, formatter *StringFormatter, indent string) {
 	if l == nil {
 		formatter.WriteLine(indent, "LetterLine: nil")
 		return
@@ -72,6 +79,7 @@ func RenderLetterLine(l *LetterLine, formatter *StringFormatter, indent string) 
 	}
 }
 
+// writeElement displays a single element or a beat group within the letter line.
 func writeElement(formatter *StringFormatter, indent string, el LetterLineElement) {
 	if el.IsBeat {
 		formatter.WriteLine(indent, "- Beat:")
@@ -79,20 +87,22 @@ func writeElement(formatter *StringFormatter, indent string, el LetterLineElemen
 			writeElement(formatter, indent+"  ", sub)
 		}
 	} else {
-		s := fmt.Sprintf("- %s: %s [Column=%d]", el.Token.Type, el.Token.Value, el.Column)
+		parts := []string{fmt.Sprintf("- %s: %s [Column=%d]", el.Token.Type, el.Token.Value, el.Column)}
+
 		if el.Octave != 0 {
-			s += fmt.Sprintf(", Octave: %+d", el.Octave)
+			parts = append(parts, fmt.Sprintf("Octave: %+d", el.Octave))
 		}
 		if el.Mordent {
-			s += ", Mordent: true"
+			parts = append(parts, "Mordent: true")
 		}
 		if el.TalaMarker != "" {
-			s += fmt.Sprintf(", Tala: %s", el.TalaMarker)
+			parts = append(parts, fmt.Sprintf("Tala: %s", el.TalaMarker))
 		}
 		if el.SyllableText != "" {
-			s += fmt.Sprintf(", Lyric: %q", el.SyllableText)
+			parts = append(parts, fmt.Sprintf("Lyric: %q", el.SyllableText))
 		}
-		formatter.WriteLine(indent, s)
+
+		formatter.WriteLine(indent, strings.Join(parts, ", "))
 	}
 }
 
