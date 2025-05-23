@@ -1,71 +1,71 @@
 package newparser
 
-func FoldAnnotations(p *Paragraph, annotations []Annotation) {
-	if p == nil || p.LetterLine == nil {
-		Log("DEBUG", "FoldAnnotations skipped: nil paragraph or letter line")
-		return
-	}
+func WalkLetterLine(line *LetterLine, visit func(*LetterLineElement)) {
+    for i := range line.Elements {
+        el := &line.Elements[i]
+        if el.IsBeat {
+            for j := range el.SubElements {
+                visit(&el.SubElements[j])
+            }
+        } else {
+            visit(el)
+        }
+    }
+}
 
-	Log("DEBUG", "FoldAnnotations called with %d annotations", len(annotations))
 
-	for _, ann := range annotations {
-		best := -1
-		bestDist := 2 // only match within ±1 column
+func ApplyAnnotations(p *Paragraph, annotations []Annotation) {
+    if p == nil || p.LetterLine == nil {
+        return
+    }
 
-		for i, el := range p.LetterLine.Elements {
-			dist := abs(el.Column - ann.Column)
-			if dist < bestDist {
-				best = i
-				bestDist = dist
-			}
-		}
+    Log("DEBUG", "ApplyAnnotations called with %d annotations", len(annotations))
+		Log("DEBUG", "ApplyAnnotations called with annotations: %s", annotations)
 
-		if best == -1 {
-			Log("DEBUG", "No match found for annotation %s at column %d", ann.Type, ann.Column)
+    // Flatten all pitch/dash-level elements with their positions
+    var elements []*LetterLineElement
+    WalkLetterLine(p.LetterLine, func(el *LetterLineElement) {
+        elements = append(elements, el)
+    })
 
-			if ann.Type == Syllable {
-				if el := fallbackToLastPitch(p.LetterLine, ann); el != nil {
-					applyFallbackAnnotation(el, ann)
-				}
-			}
-
-			continue
-		}
-
-		el := &p.LetterLine.Elements[best]
-
-		// If it's a beat, try folding to its inner elements
-		if el.IsBeat && len(el.SubElements) > 0 {
-			bestInner := -1
-			bestInnerDist := 2
-			for i, sub := range el.SubElements {
-				dist := abs(sub.Column - ann.Column)
-				if dist < bestInnerDist {
-					bestInner = i
-					bestInnerDist = dist
-				}
-			}
-			if bestInner != -1 {
-				Log("DEBUG", "Folding annotation %s at column %d to inner beat element at index %d (column %d)",
-					ann.Type, ann.Column, bestInner, el.SubElements[bestInner].Column)
-				applyAnnotation(&el.SubElements[bestInner], ann)
-				continue
-			}
-		}
-
-		Log("DEBUG", "Folding annotation %s at column %d to element at index %d (column %d)",
-			ann.Type, ann.Column, best, el.Column)
-		Log("DEBUG", "Annotation %s at col %d not applied — no subelement match in beat", ann.Type, ann.Column)
-	}
+    for _, ann := range annotations {
+        best := -1
+        bestDist := 1000
+        for i, el := range elements {
+            dist := abs(el.Column - ann.Column)
+            if dist <= 1 && dist < bestDist {
+                best = i
+                bestDist = dist
+            }
+        }
+        if best != -1 {
+            el := elements[best]
+            Log("DEBUG", "Folding annotation %s at column %d to element at col %d", ann.Type, ann.Column, el.Column)
+            applyAnnotation(el, ann)
+        } else if ann.Type == Syllable {
+            el := fallbackToLastPitch(p.LetterLine, ann)
+            if el != nil {
+                Log("DEBUG", "Fallback applied for syllable at column %d", ann.Column)
+                applyFallbackAnnotation(el, ann)
+            }
+        } else {
+            Log("DEBUG", "No match found for annotation %s at column %d", ann.Type, ann.Column)
+        }
+    }
 }
 
 func applyAnnotation(el *LetterLineElement, ann Annotation) {
 	Log("DEBUG", "applyAnnotation, annotation= Type=%s, Value=%s, Column=%d", ann.Type, ann.Value, ann.Column)
+	Log("DEBUG","ann.Type= %s    HighestOctave=%s",ann.Type,HighestOctave)
 	switch ann.Type {
 	case UpperOctave:
-		el.Octave += 1
+		el.Octave = 1
+	case HighestOctave:
+		el.Octave = 2
 	case LowerOctave:
-		el.Octave -= 1
+		el.Octave = -1
+	case LowestOctave:
+		el.Octave = -2
 	case Mordent:
 		el.Mordent = true
 	case Syllable:
@@ -77,18 +77,20 @@ func applyAnnotation(el *LetterLineElement, ann Annotation) {
 
 func fallbackToLastPitch(line *LetterLine, ann Annotation) *LetterLineElement {
 	for i := len(line.Elements) - 1; i >= 0; i-- {
-		beat := &line.Elements[i]
-		if beat.IsBeat {
-			for j := len(beat.SubElements) - 1; j >= 0; j-- {
-				sub := &beat.SubElements[j]
-				if sub.Token.Type == "Pitch" {
-					Log("DEBUG", "Fallback: attaching annotation %s to last pitch at column %d", ann.Type, sub.Column)
+		el := &line.Elements[i]
+		if el.IsBeat {
+			for j := len(el.SubElements) - 1; j >= 0; j-- {
+				sub := &el.SubElements[j]
+				if sub.Token.Type == Pitch {
 					return sub
 				}
 			}
+		} else {
+			if el.Token.Type == Pitch {
+				return el
+			}
 		}
 	}
-	Log("DEBUG", "Fallback failed: no pitch found for annotation %s", ann.Type)
 	return nil
 }
 
@@ -99,9 +101,8 @@ func abs(x int) int {
 	return x
 }
 
-
-
 func applyFallbackAnnotation(el *LetterLineElement, ann Annotation) {
 	Log("DEBUG", "applyFallbackAnnotation: %s -> ExtraSyllables", ann.Value)
 	el.ExtraSyllables = append(el.ExtraSyllables, ann.Value)
 }
+
