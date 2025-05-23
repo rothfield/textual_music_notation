@@ -14,13 +14,13 @@ func SplitLinesByType(lines []string) SplitLines {
 
     for i, typ := range types {
         switch typ {
-        case LetterLineRole:
+        case LetterLineType:
             result.LetterLine = lines[i]
-        case UpperAnnotationsLineRole:
+        case UpperAnnotationType:
             result.UpperAnnotations = append(result.UpperAnnotations, lines[i])
-        case LowerAnnotationsLineRole:
+        case LowerAnnotationType:
             result.LowerAnnotations = append(result.LowerAnnotations, lines[i])
-        case LyricLineRole:
+        case LyricLineType:
             result.LyricLines = append(result.LyricLines, lines[i])
         }
     }

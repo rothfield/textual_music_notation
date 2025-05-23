@@ -4,12 +4,12 @@ import (
     "strings"
 )
 
-var lineTypeNames = map[LineRole]string{
-    UnknownLineRole:     "Unknown",
-    LetterLineRole:      "LetterLine",
-    UpperAnnotationsLineRole: "UpperAnnotation",
-    LowerAnnotationsLineRole: "LowerAnnotation",
-    LyricLineRole:        "LyricLine",
+var lineTypeNames = map[LineType]string{
+    UnknownLineType:     "Unknown",
+    LetterLineType:      "LetterLine",
+    UpperAnnotationType: "UpperAnnotation",
+    LowerAnnotationType: "LowerAnnotation",
+    LyricLineType:        "LyricLine",
 }
 
 func findLetterLine(lines []string) int {
@@ -47,7 +47,7 @@ func findLetterLine(lines []string) int {
     return letterLineIndex
 }
 
-func ClassifyLines(lines []string) []LineRole {
+func ClassifyLines(lines []string) []LineType {
     Log("DEBUG", "ClassifyLines, lines=%s", lines)
 
     start := 0
@@ -61,21 +61,21 @@ func ClassifyLines(lines []string) []LineRole {
 
     if start > end {
         Log("WARN", "Empty paragraph after trimming blank lines.")
-        return []LineRole{}
+        return []LineType{}
     }
 
     lines = lines[start : end+1]
-    types := make([]LineRole, len(lines))
+    types := make([]LineType, len(lines))
     for i := range types {
-        types[i] = UnknownLineRole
+        types[i] = UnknownLineType
     }
 
     letterLineIndex := findLetterLine(lines)
     if letterLineIndex == -1 {
         Log("ERROR", "No valid LetterLine found during classification.")
-        return []LineRole{}
+        return []LineType{}
     }
-    types[letterLineIndex] = LetterLineRole
+    types[letterLineIndex] = LetterLineType
 
     foundLowerOrLyric := false
     foundLyric := false
@@ -87,25 +87,25 @@ func ClassifyLines(lines []string) []LineRole {
             continue
         }
 
-        if types[i] != UnknownLineRole {
+        if types[i] != UnknownLineType {
             continue
         }
 
         if i < letterLineIndex {
             if strings.ContainsAny(lines[i], ".:~") {
-                types[i] = UpperAnnotationsLineRole
+                types[i] = UpperAnnotationType
             }
         } else {
             if strings.TrimSpace(lines[i]) != "" {
                 if !foundLowerOrLyric {
                     if strings.ContainsAny(lines[i], ".:~") {
-                        types[i] = LowerAnnotationsLineRole
+                        types[i] = LowerAnnotationType
                     } else {
-                        types[i] = LyricLineRole
+                        types[i] = LyricLineType
                     }
                     foundLowerOrLyric = true
                 } else if !foundLyric {
-                    types[i] = LyricLineRole
+                    types[i] = LyricLineType
                     foundLyric = true
                 } else {
                     Log("WARN", "Ignoring additional line at index %d", i)

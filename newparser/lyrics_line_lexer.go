@@ -22,6 +22,7 @@ func LexLyricsAnnotationLine(line string) []Annotation {
         word := line[start:]
         annotations = append(annotations, Annotation{Type: Syllable, Value: word, Column: start})
     }
+		Log("DEBUG", "Lexed %d syllables", len(annotations))
     return annotations
 }
 
