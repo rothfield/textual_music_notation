@@ -92,31 +92,39 @@ func FormatLetterLine(l *LetterLine, formatter *StringFormatter, indent string) 
 }
 
 // writeElement displays a single element or a beat group within the letter line.
+
 func writeElement(formatter *StringFormatter, indent string, el LetterLineElement) {
 	if el.IsBeat {
 		formatter.WriteLine(indent, "- Beat:")
 		for _, sub := range el.SubElements {
 			writeElement(formatter, indent+"  ", sub)
 		}
-	} else {
-		parts := []string{fmt.Sprintf("- %s: %s [Column=%d]", el.Token.Type, el.Token.Value, el.Column)}
-
-		if el.Octave != 0 {
-			parts = append(parts, fmt.Sprintf("Octave: %+d", el.Octave))
-		}
+		return
+	}
+     
+	if el.Token.Type == "Pitch" {
+		formatter.WriteLine(indent, fmt.Sprintf("- Pitch: %s [Column=%d], Octave: %d", el.Token.Value, el.Column, el.Octave))
 		if el.Mordent {
-			parts = append(parts, "Mordent: true")
+			formatter.WriteLine(indent+"  ", "Mordent: true")
 		}
 		if el.Tala != "" {
-			parts = append(parts, fmt.Sprintf("Tala: %s", el.Tala))
+			formatter.WriteLine(indent+"  ", fmt.Sprintf("Tala: %s", el.Tala))
 		}
-		if el.Syllables != "" {
-			parts = append(parts, fmt.Sprintf("Syllable: %q", el.Syllables))
+		if el.Syllable != "" {
+			formatter.WriteLine(indent+"  ", fmt.Sprintf("Syllable: %q", el.Syllable))
 		}
-
-		formatter.WriteLine(indent, strings.Join(parts, ", "))
+		if len(el.ExtraSyllables) > 0 {
+			formatter.WriteLine(indent+"  ", fmt.Sprintf("ExtraSyllables: %q", strings.Join(el.ExtraSyllables, " ")))
+		}
+	} else if el.Token.Type == "Dash" {
+		formatter.WriteLine(indent, fmt.Sprintf("- Dash: %s [Column=%d]", el.Token.Value, el.Column))
+	} else if el.Token.Type == "Barline" {
+		formatter.WriteLine(indent, fmt.Sprintf("- Barline: %s [Column=%d]", el.Token.Value, el.Column))
+	} else if el.Token.Type == "Breath" {
+		formatter.WriteLine(indent, fmt.Sprintf("- Breath: %s [Column=%d]", el.Token.Value, el.Column))
 	}
 }
+
 
 
 
