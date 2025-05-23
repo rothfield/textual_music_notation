@@ -37,7 +37,8 @@ func ParseParagraph(lines []string) *Paragraph {
     Log("DEBUG", "Lower lines: %v", lowerLines)
     Log("DEBUG", "Lyric lines: %v", lyricLines)
 
-    tokens := LexLetterLine(letter)
+    var tokens []Token
+    tokens = LexLetterLine(letter)
     Log("DEBUG", "Lexed %d tokens from letter line", len(tokens))
     letterLine := ParseLetterLine(letter, tokens)
 
@@ -48,22 +49,26 @@ func ParseParagraph(lines []string) *Paragraph {
     syllables   []Annotation
 )
     if len(upperLines) > 0 {
-        upper := LexUpperAnnotationLine(upperLines[0])
+        
+    upper = LexUpperAnnotationLine(upperLines[0])
         Log("DEBUG", "Lexed %d upper annotations", len(upper))
         annotations = append(annotations, upper...)
     }
     if len(lowerLines) > 0 {
-        lower := LexLowerAnnotationLine(lowerLines[0])
+        
+    lower = LexLowerAnnotationLine(lowerLines[0])
         Log("DEBUG", "Lexed %d lower annotations", len(lower))
         annotations = append(annotations, lower...)
     }
     if len(lyricLines) > 0 {
-        syllables := LexLyricsAnnotationLine(lyricLines[0])
+        
+    syllables = LexLyricsAnnotationLine(lyricLines[0])
         Log("DEBUG", "Lexed %d syllable annotations", len(syllables))
         annotations = append(annotations, syllables...)
     }
 
-    paragraph := &Paragraph{
+    var paragraph *Paragraph
+    paragraph = &Paragraph{
         Raw:              strings.Join(lines, "\n"),
         LetterLine:       letterLine,
         UpperAnnotations: [][]Annotation{upper},

@@ -17,7 +17,8 @@ func findLetterLine(lines []string) int {
     letterLineIndex := -1
 
     for i, line := range lines {
-        tokens := LexLetterLine(line)
+        var tokens []Token
+    tokens = LexLetterLine(line)
         Log("DEBUG", "findLetterLine: line %d => %d tokens", i, len(tokens))
 
         if strings.TrimSpace(line) == "." || strings.TrimSpace(line) == ":" || strings.TrimSpace(line) == "~" {

@@ -13,7 +13,8 @@ func ParseComposition(input string) *Composition {
     Log("DEBUG", "ParseComposition")
 
     rawText := input
-    lines := strings.Split(input, "\n")
+    var lines []string
+    lines = strings.Split(input, "\n")
 
     start := 0
     end := len(lines) - 1
@@ -50,7 +51,8 @@ func ParseComposition(input string) *Composition {
 
     for _, para := range rawParagraphs {
         if strings.TrimSpace(para) != "" {
-            paragraph := ParseParagraph(strings.Split(para, "\n"))
+            var paragraph *Paragraph
+    paragraph = ParseParagraph(strings.Split(para, "\n"))
             if paragraph != nil && paragraph.LetterLine != nil && len(paragraph.LetterLine.Elements) > 0 {
                 parsedParagraphs = append(parsedParagraphs, paragraph)
             }

@@ -2,8 +2,10 @@ package newparser
 
 func ParseLetterLine(raw string, tokens []Token) *LetterLine {
 	Log("DEBUG", "ParseLetterLine: raw='%s'", raw)
-	parser := &letterLineParser{tokens: tokens}
-	line := parser.parse()
+	var parser *letterLineParser
+    parser = &letterLineParser{tokens: tokens}
+	var line *LetterLine
+    line = parser.parse()
 	line.Raw = raw
 	Log("DEBUG", "ParseLetterLine: parsed %d elements", len(line.Elements))
 	return line
@@ -18,11 +20,13 @@ type letterLineParser struct {
 func (p *letterLineParser) parse() *LetterLine {
 	var elements []LetterLineElement
 	for p.hasNext() {
-		tok := p.peek()
+		var tok Token
+        tok = p.peek()
 		Log("DEBUG", "parse: next token = %s", tok)
 		switch tok.Type {
 		case Pitch, Dash:
-			beat := p.parseBeat()
+			var beat *LetterLineElement
+            beat = p.parseBeat()
 			Log("DEBUG", "parse: parsed beat with %d divisions", beat.Divisions)
 			elements = append(elements, *beat)
 		case Barline, LeftSlur, RightSlur, Breath:
@@ -48,7 +52,8 @@ func (p *letterLineParser) parseBeat() *LetterLineElement {
 	Log("DEBUG", "parseBeat: starting at column %d", startCol)
 
 	for p.hasNext() {
-		tok := p.peek()
+		var tok Token
+        tok = p.peek()
 		if !isAllowedInBeat(tok.Type) {
 			break
 		}
