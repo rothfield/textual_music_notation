@@ -4,25 +4,26 @@ set SCRIPT_DIR (dirname (status -f))
 set PROJECT_ROOT (realpath "$SCRIPT_DIR/..")
 cd $PROJECT_ROOT
 
-set -g CMD go run .
-set -g pgid -1
-
-function cleanup --on-event fish_exit
-    if test $pgid -gt 0
-        echo "[watch.fish] Cleaning up process group $pgid"
-        command kill -9 -$pgid 2>/dev/null
+function kill_port_8080
+    set pids (lsof -ti :8080)
+    if test (count $pids) -gt 0
+        echo "[watch.fish] Killing processes on port 8080: $pids"
+        for pid in $pids
+            echo " - killing PID $pid"
+            kill -9 $pid
+        end
     end
 end
 
-function run_command
-    if test $pgid -gt 0
-        echo "[watch.fish] Killing previous process group $pgid"
-        command kill -9 -$pgid 2>/dev/null
-    end
+function cleanup --on-event fish_exit
+    echo "[watch.fish] Cleanup on exit"
+    kill_port_8080
+end
 
-    echo "[watch.fish] Starting: $CMD"
-    fish -c "cd $PROJECT_ROOT; exec setsid $CMD > /tmp/watch.log 2>&1" &
-    set -g pgid $last_pid
+function run_command
+    kill_port_8080
+    echo "[watch.fish] Starting: go run ."
+    go run . &
 end
 
 echo "[watch.fish] Watching $PROJECT_ROOT (excluding .git) for *.go, *.js, *.html, *.css..."
