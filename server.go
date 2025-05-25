@@ -3,6 +3,7 @@ package main
 import (
         "textual_music_notation/newparser"
 	"log"
+	"textual_music_notation/logger"
 	"net/http"
 	"github.com/gorilla/websocket"
 )
@@ -34,9 +35,9 @@ func handleWebSocket(w http.ResponseWriter, r *http.Request) {
 		log.Printf("Message received from client: %s\n", string(msg))
 
 		// Parse the composition
-		parsed := ParseComposition(string(msg))
-		formatter := &StringFormatter{}
-		DisplayCompositionTree(parsed, formatter)
+		parsed := newparser.ParseComposition(string(msg))
+		formatter := &newparser.StringFormatter{}
+		newparser.FormatComposition(parsed, formatter)
 		Log("DEBUG","\n%s",formatter.Builder.String())
 		// ✅ Send the formatted string with raw text to the client
 		err = conn.WriteMessage(websocket.TextMessage, []byte(formatter.Builder.String()))
@@ -59,9 +60,17 @@ func serveFiles() {
 }
 
 func main() {
-	InitLogger()
-	DebugLetterLine()
-	defer logFile.Close()
+	logger.InitLogger()
+//	defer logFile.Close()
 	serveFiles()
 }
 
+
+
+
+
+ 
+ 
+ 
+ 
+ 
