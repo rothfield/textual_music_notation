@@ -3,9 +3,9 @@ package newparser
 func ParseLetterLine(raw string, tokens []Token) *LetterLine {
 	Log("DEBUG", "ParseLetterLine: raw='%s'", raw)
 	var parser *letterLineParser
-    parser = &letterLineParser{tokens: tokens}
+	parser = &letterLineParser{tokens: tokens}
 	var line *LetterLine
-    line = parser.parse()
+	line = parser.parse()
 	line.Raw = raw
 	Log("DEBUG", "ParseLetterLine: parsed %d elements", len(line.Elements))
 	return line
@@ -21,12 +21,12 @@ func (p *letterLineParser) parse() *LetterLine {
 	var elements []LetterLineElement
 	for p.hasNext() {
 		var tok Token
-        tok = p.peek()
+		tok = p.peek()
 		Log("DEBUG", "parse: next token = %s", tok)
 		switch tok.Type {
 		case Pitch, Dash:
 			var beat *LetterLineElement
-            beat = p.parseBeat()
+			beat = p.parseBeat()
 			Log("DEBUG", "parse: parsed beat with %d divisions", beat.Divisions)
 			elements = append(elements, *beat)
 		case Barline, LeftSlur, RightSlur, Breath:
@@ -53,7 +53,7 @@ func (p *letterLineParser) parseBeat() *LetterLineElement {
 
 	for p.hasNext() {
 		var tok Token
-        tok = p.peek()
+		tok = p.peek()
 		if !isAllowedInBeat(tok.Type) {
 			break
 		}
@@ -91,4 +91,3 @@ func (p *letterLineParser) next() Token {
 func isAllowedInBeat(t TokenType) bool {
 	return t == Pitch || t == Dash || t == Breath || t == LeftSlur || t == RightSlur
 }
-
