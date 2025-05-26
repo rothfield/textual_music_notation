@@ -1,9 +1,9 @@
 package parser
 
-func ParseLetterLine(raw string, tokens []Token) *LetterLine {
+func ParseLetterLine(raw string, tokens []Token, system PitchSystem) *LetterLine {
 	Log("DEBUG", "ParseLetterLine: raw='%s'", raw)
 	var parser *letterLineParser
-	parser = &letterLineParser{tokens: tokens}
+	parser = &letterLineParser{tokens: tokens, system: system}
 	var line *LetterLine
 	line = parser.parse()
 	line.Raw = raw
@@ -13,6 +13,7 @@ func ParseLetterLine(raw string, tokens []Token) *LetterLine {
 
 type letterLineParser struct {
 	tokens []Token
+	system PitchSystem
 	pos    int
 	col    int
 }

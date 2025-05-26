@@ -38,9 +38,18 @@ func ParseParagraph(lines []string) *Paragraph {
 	Log("DEBUG", "Lyric lines: %v", lyricLines)
 
 	var tokens []Token
-	tokens = LexLetterLine(letter)
+	tokens = func(line string) []Token {
+        switch GuessPitchSystem(letter) {
+        case Western:
+            return LexLetterLineWestern(letter)
+        case Number:
+            return LexLetterLineNumber(letter)
+        default:
+            return LexLetterLineSargam(letter)
+        }
+    }(letter)
 	Log("DEBUG", "Lexed %d tokens from letter line", len(tokens))
-	letterLine := ParseLetterLine(letter, tokens)
+	ParseLetterLine(letter, tokens, GuessPitchSystem(letter))
 
 	var (
 		annotations []Annotation
@@ -68,9 +77,10 @@ func ParseParagraph(lines []string) *Paragraph {
 	}
 
 	var paragraph *Paragraph
+	letter_line := ParseLetterLine(letter, tokens, GuessPitchSystem(letter))
 	paragraph = &Paragraph{
 		Raw:              strings.Join(lines, "\n"),
-		LetterLine:       letterLine,
+		LetterLine:       letter_line,
 		UpperAnnotations: [][]Annotation{upper},
 		LowerAnnotations: [][]Annotation{lower},
 		LyricLines:       [][]Annotation{syllables},

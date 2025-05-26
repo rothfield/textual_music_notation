@@ -2,31 +2,53 @@
 LilyPond Generation Specifications
 ----------------------------------
 
-1️⃣  Mapping of Notation to LilyPond Pitches
+1️⃣  Mapping of Sargam Pitches to Western pitches
 -------------------------------------------
-The notation SrRgGmMPdDnN maps to the following LilyPond pitches:
+The notation SrRgGmMPdDnN maps to the following western notation pitches:
 - S → c
+  S# -> C#
 - r → db
 - R → d
+  R#   D#
 - g → eb
 - G → e
 - m → f
-- M → fis
+- M → f#
+  Pb  Gb
 - P → g
+  P#  G#
 - d → ab
 - D → a
+  D#  A#
 - n → bb
 - N → b
 
+
+We will use the english.ly lilypond directive, which lets us use fs and bb for example, for F# and Bb
+
+North Indian solfege doesn't use S# R# Pb P# or D# but they are included
+for completeness.
+
 2️⃣  Beat and Duration Calculation
 ----------------------------------
-- One Beat is exactly 1/4 of a note.
+- One Beat is always cosidered a 1/4 note
+- There is the concept of beat divisions. 
+
+S---   one beat, beat divisions=4
+S--r--  one beat, beat divisions = 6
+
+beat divisions are calculated by the number of units in the beat. A pitch or a dash counts one unit.
+pitch has a subdivision attribute, which is 1 + the number of consecutive dashes following.
+Dashes may sometimes become rests. if a  dash becomes a rest, then the subdivisions = 1 + number of consecute following dashes.
+
 - Durations are determined by:
   - The number of dashes (-) extending the note within the beat.
   - Example:
     - S--r:
-      - S with two dashes → 3/4 of a 1/4 note → 3/16 of a whole note.
-      - r → 1/4 of a 1/4 note → 1/16 of a whole note.
+      -    S--     → 3/4 of a 1/4 note → 3/16 of a whole note.
+
+      -    r      → 1/4 of a 1/4 note → 1/16 of a whole note.
+
 
 3️⃣  Fraction Reduction and Tuplets
 ------------------------------------
@@ -46,9 +68,10 @@ The notation SrRgGmMPdDnN maps to the following LilyPond pitches:
 5️⃣  Annotation Mapping
 ------------------------
 - Octaves
-  - . (Higher Octave) → c', d', etc.
-  - : (Two Octaves Higher) → c'', d'', etc.
-  - Lower octave (_) → c,, d,, etc.
+  - . (upper Octave) → lilypond c', d', etc.
+  - : (Highest Octave) → lilypond c'', d'', etc.
+  Lower octave -> lilypond c, d, etc
+  - Lowest octave  → Lilypond c,, d,, etc.
 
 - Mordent
   - If a note has a mordent, wrap it in:
@@ -68,9 +91,9 @@ The notation SrRgGmMPdDnN maps to the following LilyPond pitches:
 -------------------------------
 - All annotations are attached during the Folding Phase.
 - When generating LilyPond, the parse tree will already have:
-  - Octave shifts
+  - Octave 
   - Mordents
-  - Tala markers
+  - Talas 
   - Lyrics attached to LetterLineElement.
 
 7️⃣  Generation Strategy
