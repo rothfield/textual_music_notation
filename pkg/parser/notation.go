@@ -2,19 +2,20 @@ package parser
 
 import ()
 
-type PitchSpelling struct {
-	Step       uint8 // 0–6 (C through B)
-	Accidental int8  // -2 to +2
-}
-type PitchSystem uint8
+type Notation uint8
 
 const (
-	Western PitchSystem = iota
+	Western Notation = iota
 	Number
 	Sargam
 )
 
-var pitchSpellings = map[PitchSystem]map[string]PitchSpelling{
+type PitchCode struct {
+	DiatonicNote uint8 // 0 = C, 1 = D, ..., 6 = B
+	Alteration   int8  // -2 (double flat) to +2 (double sharp)
+}
+
+var pitchCodes = map[Notation]map[string]PitchCode{
 	Western: {
 		"C": {0, 0}, "Db": {1, -1},
 		"D": {1, 0}, "Eb": {2, -1},
@@ -50,22 +51,22 @@ var pitchSpellings = map[PitchSystem]map[string]PitchSpelling{
 	},
 }
 
-func LookupPitch(symbol string, system PitchSystem) (PitchSpelling, bool) {
-	if sysMap, ok := pitchSpellings[system]; ok {
+func LookupPitch(symbol string, system Notation) (PitchCode, bool) {
+	if sysMap, ok := pitchCodes[system]; ok {
 		spelling, found := sysMap[symbol]
 		return spelling, found
 	}
-	return PitchSpelling{}, false
+	return PitchCode{}, false
 }
 
-func GuessPitchSystem(line string) PitchSystem {
-	scores := map[PitchSystem]int{
+func GuessNotation(line string) Notation {
+	scores := map[Notation]int{
 		Western: 0,
 		Number:  0,
 		Sargam:  0,
 	}
 
-	lexers := map[PitchSystem]func(string) []Token{
+	lexers := map[Notation]func(string) []Token{
 		Western: LexLetterLineWestern,
 		Number:  LexLetterLineNumber,
 		Sargam:  LexLetterLineSargam,

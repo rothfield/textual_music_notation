@@ -18,16 +18,7 @@ func findLetterLine(lines []string) int {
 
 	for i, line := range lines {
 		var tokens []Token
-		tokens = func(line string) []Token {
-        switch GuessPitchSystem(line) {
-        case Western:
-            return LexLetterLineWestern(line)
-        case Number:
-            return LexLetterLineNumber(line)
-        default:
-            return LexLetterLineSargam(line)
-        }
-    }(line)
+		tokens = LexLetterLine(line)
 		Log("DEBUG", "findLetterLine: line %d => %d tokens", i, len(tokens))
 
 		if strings.TrimSpace(line) == "." || strings.TrimSpace(line) == ":" || strings.TrimSpace(line) == "~" {

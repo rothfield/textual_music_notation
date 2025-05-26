@@ -23,7 +23,7 @@ end
 function run_command
     kill_port_8080
     echo "[watch.fish] Starting: go run ."
-    go run . &
+    go run ./cmd/server
 end
 
 echo "[watch.fish] Watching $PROJECT_ROOT (excluding .git) for *.go, *.js, *.html, *.css..."
