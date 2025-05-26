@@ -1,35 +1,35 @@
-package newparser
+package parser
 
 type LetterLine struct {
-    Elements []LetterLineElement
-    Raw      string
+	Elements []LetterLineElement
+	Raw      string
 }
 
 type LetterLineElement struct {
-    Token        Token
-    Column       int
-    Octave       int
-    Mordent      bool
-    Tala   string
-		Syllable string
+	Token          Token
+	Column         int
+	Octave         int
+	Mordent        bool
+	Tala           string
+	Syllable       string
 	ExtraSyllables []string
-    IsBeat       bool
-    SubElements  []LetterLineElement
-    Divisions    int
+	IsBeat         bool
+	SubElements    []LetterLineElement
+	Divisions      int
 }
 
 func (t Token) GetColumn() int {
-    return t.Column
+	return t.Column
 }
 
 func (t Token) GetType() TokenType {
-    return t.Type
+	return t.Type
 }
 
 func (p LetterLineElement) GetColumn() int {
-    return p.Column
+	return p.Column
 }
 
 func (p LetterLineElement) GetType() TokenType {
-    return p.Token.Type
+	return p.Token.Type
 }

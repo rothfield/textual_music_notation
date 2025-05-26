@@ -1,4 +1,4 @@
-package newparser
+package parser
 
 func ParseLetterLine(raw string, tokens []Token) *LetterLine {
 	Log("DEBUG", "ParseLetterLine: raw='%s'", raw)

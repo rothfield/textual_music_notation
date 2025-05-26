@@ -1,8 +1,8 @@
-package newparser
+package parser
 
 import (
-	"strings"
 	"fmt"
+	"strings"
 )
 
 // StringFormatter helps build a structured and indented string output.
@@ -101,7 +101,7 @@ func writeElement(formatter *StringFormatter, indent string, el LetterLineElemen
 		}
 		return
 	}
-     
+
 	if el.Token.Type == "Pitch" {
 		formatter.WriteLine(indent, fmt.Sprintf("- Pitch: %s [Column=%d], Octave: %d", el.Token.Value, el.Column, el.Octave))
 		if el.Mordent {
@@ -124,9 +124,6 @@ func writeElement(formatter *StringFormatter, indent string, el LetterLineElemen
 		formatter.WriteLine(indent, fmt.Sprintf("- Breath: %s [Column=%d]", el.Token.Value, el.Column))
 	}
 }
-
-
-
 
 func hasAnnotations(groups [][]Annotation) bool {
 	for _, group := range groups {

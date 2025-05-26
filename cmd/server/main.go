@@ -1,11 +1,13 @@
 package main
 
 import (
-        "textual_music_notation/newparser"
-	"log"
-	"textual_music_notation/logger"
-	"net/http"
 	"github.com/gorilla/websocket"
+	"log"
+	"net/http"
+	"os"
+	"path/filepath"
+	"textual_music_notation/internal/logger"
+	"textual_music_notation/pkg/parser"
 )
 
 var upgrader = websocket.Upgrader{
@@ -23,7 +25,7 @@ func handleWebSocket(w http.ResponseWriter, r *http.Request) {
 	}
 	defer conn.Close()
 
-	Log("DEBUG", "Client Connected via WebSocket")
+	logger.DebugLogger.Println("Client Connected via WebSocket")
 
 	for {
 		log.Println("Waiting for message from client...")
@@ -34,12 +36,11 @@ func handleWebSocket(w http.ResponseWriter, r *http.Request) {
 		}
 		log.Printf("Message received from client: %s\n", string(msg))
 
-		// Parse the composition
-		parsed := newparser.ParseComposition(string(msg))
-		formatter := &newparser.StringFormatter{}
-		newparser.FormatComposition(parsed, formatter)
-		Log("DEBUG","\n%s",formatter.Builder.String())
-		// ✅ Send the formatted string with raw text to the client
+		parsed := parser.ParseComposition(string(msg))
+		formatter := &parser.StringFormatter{}
+		parser.FormatComposition(parsed, formatter)
+		logger.DebugLogger.Printf("\n%s", formatter.Builder.String())
+
 		err = conn.WriteMessage(websocket.TextMessage, []byte(formatter.Builder.String()))
 		if err != nil {
 			log.Println("WebSocket Write Error:", err)
@@ -52,7 +53,33 @@ func handleWebSocket(w http.ResponseWriter, r *http.Request) {
 }
 
 func serveFiles() {
-	fs := http.FileServer(http.Dir("./web"))
+	var webDir string
+	if exePath, err := os.Executable(); err == nil {
+		root := filepath.Dir(exePath)
+		candidate := filepath.Join(root, "../../web")
+		if _, err := os.Stat(candidate); err == nil {
+			webDir = candidate
+		}
+	}
+	if webDir == "" {
+		// fallback to working directory for go run
+		webDir = "web"
+	}
+
+	Log("DEBUG", "Serving from:%s", webDir)
+	fs := http.FileServer(http.Dir(webDir))
+	http.Handle("/", fs)
+	http.HandleFunc("/ws", handleWebSocket)
+	log.Println("Server started at http://localhost:8080")
+	log.Fatal(http.ListenAndServe(":8080", nil))
+}
+
+func xkserveFiles() {
+	exePath, _ := os.Executable()
+	root := filepath.Dir(exePath)
+	webDir := filepath.Join(root, "../../web")
+	log.Println("Serving web directory from:", webDir)
+	fs := http.FileServer(http.Dir(webDir))
 	http.Handle("/", fs)
 	http.HandleFunc("/ws", handleWebSocket)
 	log.Println("Server started at http://localhost:8080")
@@ -60,23 +87,6 @@ func serveFiles() {
 }
 
 func main() {
-	fmt.println(")
 	logger.InitLogger()
-//	defer logFile.Close()
 	serveFiles()
 }
-
-
-
-
-
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
