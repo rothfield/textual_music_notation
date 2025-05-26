@@ -10,6 +10,19 @@ const (
 	Sargam
 )
 
+func (n Notation) String() string {
+	switch n {
+	case Western:
+		return "Western"
+	case Number:
+		return "Number"
+	case Sargam:
+		return "Sargam"
+	default:
+		return "Unknown"
+	}
+}
+
 type PitchCode struct {
 	DiatonicNote uint8 // 0 = C, 1 = D, ..., 6 = B
 	Alteration   int8  // -2 (double flat) to +2 (double sharp)

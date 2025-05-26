@@ -38,6 +38,7 @@ func FormatComposition(c *Composition, formatter *StringFormatter) {
 
 // FormatParagraph displays the letter line and any associated annotations.
 func FormatParagraph(p *Paragraph, formatter *StringFormatter) {
+	formatter.WriteLine("  ", fmt.Sprintf("Notation: %s", p.Notation))
 	FormatLetterLine(p.LetterLine, formatter, "  ")
 
 	if hasAnnotations(p.UpperAnnotations) {
@@ -133,4 +134,3 @@ func hasAnnotations(groups [][]Annotation) bool {
 	}
 	return false
 }
-

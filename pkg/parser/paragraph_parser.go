@@ -5,6 +5,7 @@ import (
 )
 
 type Paragraph struct {
+	Notation Notation
 	Raw              string
 	LetterLine       *LetterLine
 	UpperAnnotations [][]Annotation
@@ -68,8 +69,10 @@ func ParseParagraph(lines []string) *Paragraph {
 	}
 
 	var paragraph *Paragraph
-	letter_line := ParseLetterLine(letter, tokens, GuessNotation(letter))
+	notation := GuessNotation(letter)
+	letter_line := ParseLetterLine(letter, tokens, notation)
 	paragraph = &Paragraph{
+		Notation: notation,
 		Raw:              strings.Join(lines, "\n"),
 		LetterLine:       letter_line,
 		UpperAnnotations: [][]Annotation{upper},
