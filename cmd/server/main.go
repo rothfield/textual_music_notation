@@ -45,7 +45,7 @@ func handleWebSocket(w http.ResponseWriter, r *http.Request) {
 	logger.Log("DEBUG", "Client Connected via WebSocket")
 
 	for {
-		log.Println("Waiting for message from client...")
+		log.Print("Waiting for message from client...\n\n\n\n")
 		_, msg, err := conn.ReadMessage()
 		if err != nil {
 			log.Println("WebSocket Read Error:", err)
@@ -88,9 +88,10 @@ func serveFiles() {
 
 func runSelfTest() {
 	//	sample := "S-- r- g | m- P D- N\n.\nhe-llo |"
-	sample := "S  "
+	sample := "S "
 	logger.Log("DEBUG", "🧪 Running self-test with input: %s", sample)
 	handleMessage(sample)
+	logger.Log("DEBUG", "------------  end self test ----\n\n\n")
 }
 
 func main() {
