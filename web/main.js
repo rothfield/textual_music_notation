@@ -1,98 +1,71 @@
-const socketUrl = "ws://localhost:8080/ws";
+const output = document.getElementById("output-content");
+const lilypond = document.getElementById("lilypond-content");
+const editor = document.getElementById("editor");
+const svgContainer = document.getElementById("svg-container");
+const htmlOutput = document.getElementById("html-output");
+const connectionStatus = document.getElementById("connection-status");
+
 let socket;
-let lastMessage = "";
-let debounceTimeout;
 
-/**
- * ✅ Establishes the WebSocket connection and handles events
- */
-function connectWebSocket() {
-    console.log("Connecting to WebSocket...");
-    socket = new WebSocket(socketUrl);
-
-    /**
-     * ✅ On successful connection, reset and re-send the last message if available
-     */
-    socket.onopen = function() {
-        console.log("Connected to WebSocket server");
-        document.getElementById("connection-status").innerText = "Connected";
-        document.getElementById("connection-status").style.backgroundColor = "green";
-
-        // ✅ Resend the last message if there was one
-        if (lastMessage) {
-            console.log("Resending last message...");
-            socket.send(lastMessage);
-
-            // Log to the console
-            console.log(`Request re-sent: ${lastMessage}`);
-        }
-    };
-
-    /**
-     * ✅ On message received, split the sections and render appropriately
-     */
-    socket.onmessage = function(event) {
-        const sections = event.data.split("=== Staff Notation (SVG) ===");
-        const treeAndLily = sections[0];
-        const svgData = sections[1] ?? "";
-
-        const parts = treeAndLily.split("=== LilyPond Source ===");
-        document.getElementById("output-content").innerText = parts[0];
-        document.getElementById("lilypond-content").innerText = parts[1];
-
-        const svgContainer = document.getElementById("svg-container");
-        svgContainer.innerHTML = svgData;
-    };
-
-    /**
-     * ✅ On connection close, attempt to reconnect every 30 seconds
-     */
-    socket.onclose = function(event) {
-        console.warn("WebSocket closed. Reason:", event.reason);
-        document.getElementById("connection-status").innerText = "Disconnected";
-        document.getElementById("connection-status").style.backgroundColor = "red";
-
-        console.log("Attempting to reconnect in 30 seconds...");
-        setTimeout(() => {
-            connectWebSocket();
-        }, 5000); // Retry every 30 seconds
-    };
-
-    /**
-     * ✅ On WebSocket error, log it to the console
-     */
-    socket.onerror = function(error) {
-        console.error("WebSocket error:", error);
-    };
+function setConnectionStatus(connected) {
+  if (connected) {
+    connectionStatus.textContent = "Connected";
+    connectionStatus.style.backgroundColor = "#2e7d32"; // green
+  } else {
+    connectionStatus.textContent = "Disconnected";
+    connectionStatus.style.backgroundColor = "#c62828"; // red
+  }
 }
 
-/**
- * ✅ Handle network events (offline and online recovery)
- */
-window.addEventListener("offline", () => {
-    console.warn("You are offline. WebSocket will try to reconnect when you are back online.");
-    document.getElementById("connection-status").innerText = "Offline";
-    document.getElementById("connection-status").style.backgroundColor = "orange";
+function connect() {
+  socket = new WebSocket("ws://localhost:8080/ws");
+
+  socket.onopen = () => {
+    console.log("✅ WebSocket connected");
+    setConnectionStatus(true);
+    sendNotation();
+  };
+
+  socket.onmessage = (event) => {
+    let data;
+    try {
+      data = JSON.parse(event.data);
+    } catch (err) {
+      console.error("❌ JSON parse error:", event.data);
+      return;
+    }
+
+    if (data.tree) output.textContent = data.tree;
+    if (data.lilypond) lilypond.textContent = data.lilypond;
+    if (data.svg) svgContainer.innerHTML = data.svg;
+    if (data.html) htmlOutput.innerHTML = data.html;
+  };
+
+  socket.onerror = (error) => {
+    console.error("WebSocket error:", error);
+  };
+
+  socket.onclose = () => {
+    console.warn("⚠️ WebSocket closed. Reconnecting in 3s...");
+    setConnectionStatus(false);
+    setTimeout(connect, 3000);
+  };
+}
+
+function sendNotation() {
+  if (socket && socket.readyState === WebSocket.OPEN) {
+    socket.send(editor.value);
+  }
+}
+
+// Debounced user input
+let debounceTimer;
+editor.addEventListener("input", () => {
+  clearTimeout(debounceTimer);
+  debounceTimer = setTimeout(() => {
+    sendNotation();
+  }, 200);
 });
 
-window.addEventListener("online", () => {
-    console.log("You are back online. Attempting WebSocket reconnection...");
-    connectWebSocket();
-});
-
-/**
- * ✅ Handle input changes with debouncing
- */
-document.getElementById("notation-input").addEventListener("input", (event) => {
-    clearTimeout(debounceTimeout);
-    debounceTimeout = setTimeout(() => {
-        lastMessage = event.target.value;
-        if (socket.readyState === WebSocket.OPEN) {
-            socket.send(lastMessage);
-        }
-    }, 300);
-});
-
-// ✅ Initial connection
-connectWebSocket();
+connect();
 

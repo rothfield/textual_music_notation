@@ -1,40 +1,43 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>Letter Notation Parser</title>
-    <link rel="stylesheet" href="styles.css?v=3">
+  <meta charset="UTF-8" />
+  <title>Letter Notation Parser</title>
+  <link rel="stylesheet" href="styles.css?v=1748358972">
+  <link href="https://fonts.googleapis.com/css2?family=Fira+Code&display=swap" rel="stylesheet">
 </head>
 <body>
-    <div class="container">
-        <h2>Letter Notation Parser</h2>
+  <div class="container">
+    <h1>Letter Notation Parser</h1>
 
-        <!-- Connection Status Indicator -->
-        <div id="connection-status" style="padding: 5px; color: white; background-color: green; margin-bottom: 10px;">
-            Connected
-        </div>
+    <div id="connection-status">Connected</div>
 
-        <!-- Text Input for Notation -->
-        <textarea id="notation-input" placeholder="Type your letter notation here..."></textarea>
+    <textarea id="editor" placeholder="Type your letter notation here..."></textarea>
 
-        <!-- Display Sections -->
-        <div id="sections">
-            <div class="section">
-                <h2>Parse Tree Structure</h2>
-                <pre id="output-content"></pre>
-            </div>
-            <div class="section">
-                <h2>LilyPond Source Code</h2>
-                <pre id="lilypond-content"></pre>
-            </div>
-            <div class="section">
-                <h2>Staff Notation (SVG)</h2>
-                <div id="svg-container"></div>
-            </div>
-        </div>
+    <div id="sections">
+      <div class="section">
+        <h2>Rendered Notation</h2>
+        <div id="html-output" class="composition"></div>
+      </div>
+
+      <div class="section">
+        <h2>Parse Tree Structure</h2>
+        <pre id="output-content" class="output"></pre>
+      </div>
+
+      <div class="section">
+        <h2>LilyPond Source Code</h2>
+        <pre id="lilypond-content" class="output"></pre>
+      </div>
+
+      <div class="section">
+        <h2>Staff Notation (SVG)</h2>
+        <div id="svg-container" class="svg-output"></div>
+      </div>
     </div>
+  </div>
 
-    <script src="main.js?v=8"></script>
+  <script src="main.js?v=1748358972"></script>
 </body>
 </html>
 

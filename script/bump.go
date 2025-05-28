@@ -2,59 +2,46 @@ package main
 
 import (
 	"fmt"
-	"io/ioutil"
 	"log"
+	"os"
 	"regexp"
-	"strings"
+	"time"
 )
 
-// ✅ Bump the version in the file URLs
+// ✅ Bump the version in the file URLs using current timestamp
 func bumpVersion(htmlContent string) string {
-	log.Println("🔄 Bumping versions for all JS and CSS...")
+	log.Println("🔄 Replacing version with timestamp...")
 
-	// ✅ Regular expressions to match any JS and CSS links
-	jsRegex := regexp.MustCompile(`(<script\s+.*src=")([^"]*\.js\?v=)(\d+)(".*><\/script>)`)
-	cssRegex := regexp.MustCompile(`(<link\s+.*href=")([^"]*\.css\?v=)(\d+)(".*>)`)
+	// ✅ Match any <script src="...js?v=..."> and <link href="...css?v=...">
+	jsRegex := regexp.MustCompile(`(<script\s+[^>]*src=")([^"]*\.js\?v=)(\d+)(".*?>\s*</script>)`)
+	cssRegex := regexp.MustCompile(`(<link\s+[^>]*href=")([^"]*\.css\?v=)(\d+)(".*?>)`)
 
-	// ✅ Bump JS version
-	htmlContent = jsRegex.ReplaceAllStringFunc(htmlContent, func(s string) string {
-		parts := strings.Split(s, "?v=")
-		version := parts[1][:strings.Index(parts[1], "\"")]
-		newVersion := fmt.Sprintf("%d", atoi(version)+1)
-		log.Printf("✅ Bumped JS version to %s", newVersion)
-		// ✅ Fixed formatting here
-		return fmt.Sprintf("%s?v=%s%s", parts[0], newVersion, parts[1][strings.Index(parts[1], "\""):])
-	})
+	// ✅ Use current UNIX timestamp
+	timestamp := fmt.Sprintf("%d", time.Now().Unix())
 
-	// ✅ Bump CSS version
-	htmlContent = cssRegex.ReplaceAllStringFunc(htmlContent, func(s string) string {
-		parts := strings.Split(s, "?v=")
-		version := parts[1][:strings.Index(parts[1], "\"")]
-		newVersion := fmt.Sprintf("%d", atoi(version)+1)
-		log.Printf("✅ Bumped CSS version to %s", newVersion)
-		// ✅ Fixed formatting here
-		return fmt.Sprintf("%s?v=%s%s", parts[0], newVersion, parts[1][strings.Index(parts[1], "\""):])
-	})
+	// ✅ Replace JS version
+	htmlContent = jsRegex.ReplaceAllString(htmlContent, fmt.Sprintf("${1}${2}%s${4}", timestamp))
 
+	// ✅ Replace CSS version
+	htmlContent = cssRegex.ReplaceAllString(htmlContent, fmt.Sprintf("${1}${2}%s${4}", timestamp))
+
+	log.Printf("✅ Updated all versions to timestamp: %s", timestamp)
 	return htmlContent
 }
 
-// ✅ Helper to convert string to integer
-func atoi(s string) int {
-	var result int
-	_, err := fmt.Sscanf(s, "%d", &result)
-	if err != nil {
-		log.Fatalf("Error converting string to int: %v", err)
-	}
-	return result
-}
-
 func main() {
-	// ✅ Path to index.html (adjusted to web folder)
-	htmlFilePath := "../web/index.html" 
+	dir, err := os.Getwd()
+	if err != nil {
+		fmt.Println("Error:", err)
+		return
+	}
+	fmt.Println("Current working directory:", dir)
+
+	// ✅ Path to index.html (adjust if needed)
+	htmlFilePath := "./web/index.html"
 
 	// ✅ Read the contents of the index.html file
-	content, err := ioutil.ReadFile(htmlFilePath)
+	content, err := os.ReadFile(htmlFilePath)
 	if err != nil {
 		log.Fatalf("Failed to read index.html: %v", err)
 	}
@@ -63,11 +50,11 @@ func main() {
 	updatedContent := bumpVersion(string(content))
 
 	// ✅ Write the updated content back to index.html
-	err = ioutil.WriteFile(htmlFilePath, []byte(updatedContent), 0644)
+	err = os.WriteFile(htmlFilePath, []byte(updatedContent), 0644)
 	if err != nil {
 		log.Fatalf("Failed to write updated content to index.html: %v", err)
 	}
 
-	log.Println("✅ index.html has been updated with new version numbers.")
+	log.Println("✅ index.html has been updated with timestamped version numbers.")
 }
 

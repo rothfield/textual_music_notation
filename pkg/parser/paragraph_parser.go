@@ -23,7 +23,7 @@ func ParseParagraph(lines []string) *Paragraph {
 
 	Log("DEBUG", "ParseParagraph raw lines:\n%s", strings.Join(lines, "\n"))
 
-	split := SplitLinesByType(lines)
+	split := SplitParagraph(lines)
 	letter := split.LetterLine
 	uppers := split.UpperAnnotations
 	lowers := split.LowerAnnotations

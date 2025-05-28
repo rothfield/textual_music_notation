@@ -1,13 +1,14 @@
 package main
 
 import (
-	"github.com/gorilla/websocket"
 	"log"
 	"net/http"
 	"os"
 	"path/filepath"
 	"textual_music_notation/internal/logger"
 	"textual_music_notation/pkg/parser"
+
+	"github.com/gorilla/websocket"
 )
 
 var upgrader = websocket.Upgrader{
@@ -16,8 +17,24 @@ var upgrader = websocket.Upgrader{
 	},
 }
 
+func handleMessage(msg string) map[string]string {
+	parsed := parser.ParseComposition(msg)
+	formatter := &parser.StringFormatter{}
+	parser.FormatComposition(parsed, formatter)
+	treeOutput := formatter.Builder.String()
+	htmlOutput := parser.RenderHTMLComposition(parsed)
+
+	logger.Log("DEBUG", "Tree Output:\n%s", treeOutput)
+	logger.Log("DEBUG", "HTML Output:\n%s", htmlOutput)
+
+	return map[string]string{
+		"tree": treeOutput,
+		"html": htmlOutput,
+	}
+}
+
 func handleWebSocket(w http.ResponseWriter, r *http.Request) {
-	log.Println("WebSocket request received, upgrading the connection...")
+	logger.Log("DEBUG", "WebSocket request received, upgrading the connection...")
 	conn, err := upgrader.Upgrade(w, r, nil)
 	if err != nil {
 		log.Println("WebSocket Upgrade Error:", err)
@@ -25,7 +42,7 @@ func handleWebSocket(w http.ResponseWriter, r *http.Request) {
 	}
 	defer conn.Close()
 
-	logger.DebugLogger.Println("Client Connected via WebSocket")
+	logger.Log("DEBUG", "Client Connected via WebSocket")
 
 	for {
 		log.Println("Waiting for message from client...")
@@ -36,13 +53,9 @@ func handleWebSocket(w http.ResponseWriter, r *http.Request) {
 		}
 		log.Printf("Message received from client: %s\n", string(msg))
 
-		parsed := parser.ParseComposition(string(msg))
-		formatter := &parser.StringFormatter{}
-		parser.FormatComposition(parsed, formatter)
-		logger.DebugLogger.Printf("\n%s", formatter.Builder.String())
+		response := handleMessage(string(msg))
 
-		err = conn.WriteMessage(websocket.TextMessage, []byte(formatter.Builder.String()))
-		if err != nil {
+		if err := conn.WriteJSON(response); err != nil {
 			log.Println("WebSocket Write Error:", err)
 			break
 		}
@@ -62,31 +75,26 @@ func serveFiles() {
 		}
 	}
 	if webDir == "" {
-		// fallback to working directory for go run
 		webDir = "web"
 	}
 
-	Log("DEBUG", "Serving from:%s", webDir)
+	logger.Log("DEBUG", "Serving from: %s", webDir)
 	fs := http.FileServer(http.Dir(webDir))
 	http.Handle("/", fs)
 	http.HandleFunc("/ws", handleWebSocket)
-	log.Println("Server started at http://localhost:8080")
+	logger.Log("INFO", "Server started at http://localhost:8080")
 	log.Fatal(http.ListenAndServe(":8080", nil))
 }
 
-func xkserveFiles() {
-	exePath, _ := os.Executable()
-	root := filepath.Dir(exePath)
-	webDir := filepath.Join(root, "../../web")
-	log.Println("Serving web directory from:", webDir)
-	fs := http.FileServer(http.Dir(webDir))
-	http.Handle("/", fs)
-	http.HandleFunc("/ws", handleWebSocket)
-	log.Println("Server started at http://localhost:8080")
-	log.Fatal(http.ListenAndServe(":8080", nil))
+func runSelfTest() {
+	//	sample := "S-- r- g | m- P D- N\n.\nhe-llo |"
+	sample := "S  "
+	logger.Log("DEBUG", "🧪 Running self-test with input: %s", sample)
+	handleMessage(sample)
 }
 
 func main() {
 	logger.InitLogger()
+	runSelfTest()
 	serveFiles()
 }

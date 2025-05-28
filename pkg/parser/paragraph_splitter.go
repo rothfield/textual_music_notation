@@ -7,7 +7,7 @@ type SplitLines struct {
 	LyricLines       []string
 }
 
-func SplitLinesByType(lines []string) SplitLines {
+func SplitParagraph(lines []string) SplitLines {
 	types := ClassifyLines(lines)
 
 	var result SplitLines

@@ -1,10 +1,13 @@
 #!/usr/bin/env fish
 
 set SCRIPT_DIR (dirname (status -f))
+echo "script dir"
+echo $SCRIPT_DIR
 set PROJECT_ROOT (realpath "$SCRIPT_DIR/..")
 cd $PROJECT_ROOT
 
 function kill_port_8080
+	echo "kill_port_8080"
     set pids (lsof -ti :8080)
     if test (count $pids) -gt 0
         echo "[watch.fish] Killing processes on port 8080: $pids"
@@ -27,9 +30,9 @@ function run_command
 end
 
 echo "[watch.fish] Watching $PROJECT_ROOT (excluding .git) for *.go, *.js, *.html, *.css..."
-run_command
 
 while true
+    echo "in while"
     inotifywait -r -e modify,create,delete,move . \
         --exclude '/\.git/' --format '%w%f' |
     while read changed
