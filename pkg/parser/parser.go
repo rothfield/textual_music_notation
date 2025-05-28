@@ -19,19 +19,19 @@ type letterLineParser struct {
 }
 
 func (p *letterLineParser) parse() *LetterLine {
-	var elements []LetterLineElement
+	var elements []Element
 	for p.hasNext() {
 		var tok Token
 		tok = p.peek()
 		Log("DEBUG", "parse: next token = %s", tok)
 		switch tok.Type {
 		case Pitch, Dash:
-			var beat *LetterLineElement
+			var beat *Element
 			beat = p.parseBeat()
 			Log("DEBUG", "parse: parsed beat with %d divisions", beat.Divisions)
 			elements = append(elements, *beat)
 		case Barline, LeftSlur, RightSlur, Breath:
-			elements = append(elements, LetterLineElement{
+			elements = append(elements, Element{
 				Token:  p.next(),
 				Column: p.col,
 			})
@@ -45,8 +45,8 @@ func (p *letterLineParser) parse() *LetterLine {
 	return &LetterLine{Elements: elements}
 }
 
-func (p *letterLineParser) parseBeat() *LetterLineElement {
-	var sub []LetterLineElement
+func (p *letterLineParser) parseBeat() *Element {
+	var sub []Element
 	startCol := p.col
 	divisions := 0
 
@@ -58,7 +58,7 @@ func (p *letterLineParser) parseBeat() *LetterLineElement {
 		if !isAllowedInBeat(tok.Type) {
 			break
 		}
-		sub = append(sub, LetterLineElement{
+		sub = append(sub, Element{
 			Token:  p.next(),
 			Column: p.col,
 		})
@@ -67,7 +67,7 @@ func (p *letterLineParser) parseBeat() *LetterLineElement {
 		Log("DEBUG", "parseBeat: added %s to beat at col %d", tok, p.col)
 	}
 
-	return &LetterLineElement{
+	return &Element{
 		IsBeat:      true,
 		Column:      startCol,
 		SubElements: sub,

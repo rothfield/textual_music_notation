@@ -60,7 +60,7 @@ func RenderHTMLParagraph(p *Paragraph) string {
 	return sb.String()
 }
 
-func renderElementHTML(el *LetterLineElement) string {
+func renderElementHTML(el *Element) string {
 	txt := html.EscapeString(el.Token.Value)
 	typ := strings.ToLower(el.Token.Type.String())
 
@@ -108,4 +108,3 @@ func renderElementHTML(el *LetterLineElement) string {
 	sb.WriteString(`</span>`)
 	return sb.String()
 }
-

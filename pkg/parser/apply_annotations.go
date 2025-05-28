@@ -1,6 +1,6 @@
 package parser
 
-func WalkLetterLine(line *LetterLine, visit func(*LetterLineElement)) {
+func Walk(line *LetterLine, visit func(*Element)) {
 	for i := range line.Elements {
 		el := &line.Elements[i]
 		if el.IsBeat {
@@ -22,8 +22,8 @@ func ApplyAnnotations(p *Paragraph, annotations []Annotation) {
 	Log("DEBUG", "ApplyAnnotations called with annotations: %s", annotations)
 
 	// Flatten all pitch/dash-level elements with their positions
-	var elements []*LetterLineElement
-	WalkLetterLine(p.LetterLine, func(el *LetterLineElement) {
+	var elements []*Element
+	Walk(p.LetterLine, func(el *Element) {
 		elements = append(elements, el)
 	})
 
@@ -53,7 +53,7 @@ func ApplyAnnotations(p *Paragraph, annotations []Annotation) {
 	}
 }
 
-func applyAnnotation(el *LetterLineElement, ann Annotation) {
+func applyAnnotation(el *Element, ann Annotation) {
 	Log("DEBUG", "applyAnnotation, annotation= Type=%s, Value=%s, Column=%d", ann.Type, ann.Value, ann.Column)
 	Log("DEBUG", "ann.Type= %s    HighestOctave=%s", ann.Type, HighestOctave)
 	switch ann.Type {
@@ -74,7 +74,7 @@ func applyAnnotation(el *LetterLineElement, ann Annotation) {
 	}
 }
 
-func fallbackToLastPitch(line *LetterLine, ann Annotation) *LetterLineElement {
+func fallbackToLastPitch(line *LetterLine, ann Annotation) *Element {
 	for i := len(line.Elements) - 1; i >= 0; i-- {
 		el := &line.Elements[i]
 		if el.IsBeat {
@@ -100,7 +100,7 @@ func abs(x int) int {
 	return x
 }
 
-func applyFallbackAnnotation(el *LetterLineElement, ann Annotation) {
+func applyFallbackAnnotation(el *Element, ann Annotation) {
 	Log("DEBUG", "applyFallbackAnnotation: %s -> ExtraSyllables", ann.Value)
 	el.ExtraSyllables = append(el.ExtraSyllables, ann.Value)
 }

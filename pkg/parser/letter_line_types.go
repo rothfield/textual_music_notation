@@ -1,11 +1,11 @@
 package parser
 
 type LetterLine struct {
-	Elements []LetterLineElement
+	Elements []Element
 	Raw      string
 }
 
-type LetterLineElement struct {
+type Element struct {
 	Token          Token
 	Column         int
 	Octave         int
@@ -14,7 +14,7 @@ type LetterLineElement struct {
 	Syllable       string
 	ExtraSyllables []string
 	IsBeat         bool
-	SubElements    []LetterLineElement
+	SubElements    []Element
 	Divisions      int
 }
 
@@ -26,10 +26,10 @@ func (t Token) GetType() TokenType {
 	return t.Type
 }
 
-func (p LetterLineElement) GetColumn() int {
+func (p Element) GetColumn() int {
 	return p.Column
 }
 
-func (p LetterLineElement) GetType() TokenType {
+func (p Element) GetType() TokenType {
 	return p.Token.Type
 }

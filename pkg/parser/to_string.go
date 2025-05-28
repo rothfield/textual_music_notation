@@ -94,7 +94,7 @@ func FormatLetterLine(l *LetterLine, formatter *StringFormatter, indent string) 
 
 // writeElement displays a single element or a beat group within the letter line.
 
-func writeElement(formatter *StringFormatter, indent string, el LetterLineElement) {
+func writeElement(formatter *StringFormatter, indent string, el Element) {
 	if el.IsBeat {
 		formatter.WriteLine(indent, "- Beat:")
 		for _, sub := range el.SubElements {
