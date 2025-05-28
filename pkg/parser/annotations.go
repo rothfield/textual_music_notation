@@ -17,11 +17,11 @@ type Annotation struct {
 func LexAnnotation(line string, role AnnotationRole) []Annotation {
 	switch role {
 	case Upper:
-		return LexUpperAnnotationLine(line)
+		return LexUpper(line)
 	case Lower:
-		return LexLowerAnnotationLine(line)
+		return LexLower(line)
 	case Lyrics:
-		return LexLyricsAnnotationLine(line)
+		return LexLyrics(line)
 	default:
 		return nil
 	}

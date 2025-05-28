@@ -1,11 +1,11 @@
 package parser
 
-func LexUpperAnnotationLine(line string) []Annotation {
+func LexUpper(line string) []Annotation {
 	var annotations []Annotation
-	Log("DEBUG", "Entering LexUpperAnnotationLine:")
+	Log("DEBUG", "Entering LexUpper:")
 	column := 0
 	for _, r := range line {
-		Log("DEBUG", "LexUpperAnnotationLine: rune=%q col=%d", r, column)
+		Log("DEBUG", "LexUpper: rune=%q col=%d", r, column)
 		switch r {
 		case '.':
 			annotations = append(annotations, Annotation{Type: UpperOctave, Value: ".", Column: column})

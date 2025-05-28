@@ -51,19 +51,19 @@ func ParseParagraph(lines []string) *Paragraph {
 	)
 	if len(uppers) > 0 {
 
-		upper = LexUpperAnnotationLine(uppers[0])
+		upper = LexUpper(uppers[0])
 		Log("DEBUG", "Lexed %d upper annotations", len(upper))
 		annotations = append(annotations, upper...)
 	}
 	if len(lowers) > 0 {
 
-		lower = LexLowerAnnotationLine(lowers[0])
+		lower = LexLower(lowers[0])
 		Log("DEBUG", "Lexed %d lower annotations", len(lower))
 		annotations = append(annotations, lower...)
 	}
 	if len(lyricLines) > 0 {
 
-		syllables = LexLyricsAnnotationLine(lyricLines[0])
+		syllables = LexLyrics(lyricLines[0])
 		Log("DEBUG", "Lexed %d syllable annotations", len(syllables))
 		annotations = append(annotations, syllables...)
 	}

@@ -1,6 +1,6 @@
 package parser
 
-func LexLowerAnnotationLine(line string) []Annotation {
+func LexLower(line string) []Annotation {
 	var annotations []Annotation
 	for i, r := range line {
 		switch r {

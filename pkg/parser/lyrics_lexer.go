@@ -2,7 +2,7 @@ package parser
 
 import "unicode"
 
-func LexLyricsAnnotationLine(line string) []Annotation {
+func LexLyrics(line string) []Annotation {
 	var annotations []Annotation
 	start := -1
 	for i, r := range line {
