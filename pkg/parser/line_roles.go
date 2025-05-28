@@ -4,7 +4,7 @@ type LineRole int
 
 const (
 	UnknownLineRole LineRole = -1
-	LetterLineRole  LineRole = iota
+	PitchLineRole   LineRole = iota
 	UpperAnnotationsLineRole
 	LowerAnnotationsLineRole
 	LyricLineRole

@@ -30,7 +30,7 @@ func (p *letterLineParser) parse() *Line {
 			beat = p.parseBeat()
 			Log("DEBUG", "parse: parsed beat with %d divisions", beat.Divisions)
 			elements = append(elements, *beat)
-		case Barline, LeftSlur, RightSlur, Breath:
+		case Barline, LeftSlur, RightSlur, Breath, Space:
 			elements = append(elements, Element{
 				Token:  p.next(),
 				Column: p.col,

@@ -61,6 +61,11 @@ func RenderHTMLParagraph(p *Paragraph) string {
 }
 
 func renderElementHTML(el *Element) string {
+	if el.Token.Type == LeftSlur || el.Token.Type == RightSlur {
+		return `<span class="slur-marker ` +
+			strings.ToLower(el.Token.Type.String()) + `" aria-hidden="true"></span>`
+	}
+
 	txt := html.EscapeString(el.Token.Value)
 	typ := strings.ToLower(el.Token.Type.String())
 

@@ -1,6 +1,6 @@
 package parser
 
-func LexLineNumber(line string) []Token {
+func Lex123(line string) []Token {
 	var tokens []Token
 	col := 0
 	for col < len(line) {

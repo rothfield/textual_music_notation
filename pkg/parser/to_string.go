@@ -6,7 +6,6 @@ import (
 )
 
 // StringFormatter helps build a structured and indented string output.
-// It wraps strings.Builder with convenience methods for writing lines.
 type StringFormatter struct {
 	Builder strings.Builder
 }
@@ -93,7 +92,6 @@ func FormatLine(l *Line, formatter *StringFormatter, indent string) {
 }
 
 // writeElement displays a single element or a beat group within the letter line.
-
 func writeElement(formatter *StringFormatter, indent string, el Element) {
 	if el.IsBeat {
 		formatter.WriteLine(indent, "- Beat:")
@@ -103,8 +101,12 @@ func writeElement(formatter *StringFormatter, indent string, el Element) {
 		return
 	}
 
-	if el.Token.Type == "Pitch" {
-		formatter.WriteLine(indent, fmt.Sprintf("- Pitch: %s [Column=%d], Octave: %d", el.Token.Value, el.Column, el.Octave))
+	col := el.Column
+	val := el.Token.Value
+
+	switch el.Token.Type {
+	case "Pitch":
+		formatter.WriteLine(indent, fmt.Sprintf("- Pitch: %s [Column=%d], Octave: %d", val, col, el.Octave))
 		if el.Mordent {
 			formatter.WriteLine(indent+"  ", "Mordent: true")
 		}
@@ -117,15 +119,12 @@ func writeElement(formatter *StringFormatter, indent string, el Element) {
 		if len(el.ExtraSyllables) > 0 {
 			formatter.WriteLine(indent+"  ", fmt.Sprintf("ExtraSyllables: %q", strings.Join(el.ExtraSyllables, " ")))
 		}
-	} else if el.Token.Type == "Dash" {
-		formatter.WriteLine(indent, fmt.Sprintf("- Dash: %s [Column=%d]", el.Token.Value, el.Column))
-	} else if el.Token.Type == "Barline" {
-		formatter.WriteLine(indent, fmt.Sprintf("- Barline: %s [Column=%d]", el.Token.Value, el.Column))
-	} else if el.Token.Type == "Breath" {
-		formatter.WriteLine(indent, fmt.Sprintf("- Breath: %s [Column=%d]", el.Token.Value, el.Column))
+	default:
+		formatter.WriteLine(indent, fmt.Sprintf("- %s: %q [Column=%d]", el.Token.Type.String(), val, col))
 	}
 }
 
+// hasAnnotations checks whether any annotation lines are non-empty.
 func hasAnnotations(groups [][]Annotation) bool {
 	for _, group := range groups {
 		if len(group) > 0 {
@@ -134,3 +133,4 @@ func hasAnnotations(groups [][]Annotation) bool {
 	}
 	return false
 }
+

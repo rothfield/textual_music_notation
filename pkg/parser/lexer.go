@@ -5,7 +5,7 @@ func LexLine(line string) []Token {
 	case Western:
 		return LexABC(line)
 	case Number:
-		return LexLineNumber(line)
+		return Lex123(line)
 	default:
 		return LexLineSargam(line)
 	}

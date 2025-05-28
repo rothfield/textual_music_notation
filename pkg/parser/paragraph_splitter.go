@@ -14,7 +14,7 @@ func SplitParagraph(lines []string) SplitLines {
 
 	for i, typ := range types {
 		switch typ {
-		case LetterLineType:
+		case PitchLineType:
 			result.Line = lines[i]
 		case UpperAnnotationType:
 			result.UpperAnnotations = append(result.UpperAnnotations, lines[i])

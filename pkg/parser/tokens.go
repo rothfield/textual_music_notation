@@ -47,6 +47,9 @@ func (t TokenType) String() string {
 		return "tala"
 	case Syllable:
 		return "syllable"
+	case Space:
+		return "space" // <-- ADD THIS LINE
+
 	default:
 		return "unknown"
 	}

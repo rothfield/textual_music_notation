@@ -81,7 +81,7 @@ func GuessNotation(line string) Notation {
 
 	lexers := map[Notation]func(string) []Token{
 		Western: LexABC,
-		Number:  LexLineNumber,
+		Number:  Lex123,
 		Sargam:  LexLineSargam,
 	}
 

@@ -1,9 +1,9 @@
 package parser
 
-type AnnotationRole int
+type AnnotationLineRole int
 
 const (
-	Upper AnnotationRole = iota
+	Upper AnnotationLineRole = iota
 	Lower
 	Lyrics
 )
@@ -14,7 +14,7 @@ type Annotation struct {
 	Column int
 }
 
-func LexAnnotation(line string, role AnnotationRole) []Annotation {
+func LexAnnotation(line string, role AnnotationLineRole) []Annotation {
 	switch role {
 	case Upper:
 		return LexUpper(line)

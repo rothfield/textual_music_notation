@@ -2,30 +2,23 @@ package parser
 
 import (
 	"strings"
+	"textual_music_notation/internal/logger"
 )
 
-var lineTypeNames = map[LineType]string{
-	UnknownLineType:     "Unknown",
-	LetterLineType:      "LetterLine",
-	UpperAnnotationType: "UpperAnnotation",
-	LowerAnnotationType: "LowerAnnotation",
-	LyricLineType:       "LyricLine",
-}
-
-func findLetterLine(lines []string) int {
+func findPitchLine(lines []string) int {
+	logger.Log("DEBUG", "findPitchLine %s", lines)
 	maxTokens := 0
-	letterLineIndex := -1
+	bestIndex := -1
 
 	for i, line := range lines {
-		var tokens []Token
-		tokens = LexLine(line)
-		Log("DEBUG", "findLetterLine: line %d => %d tokens", i, len(tokens))
+		tokens := LexLine(line)
+		Log("DEBUG", "findPitchLine: line %d => %d tokens", i, len(tokens))
+		Log("DEBUG", "findPitchLine: tokens %s ", tokens)
 
 		if strings.TrimSpace(line) == "." || strings.TrimSpace(line) == ":" || strings.TrimSpace(line) == "~" {
 			continue
 		}
 
-		// Count Unknown tokens
 		unknowns := 0
 		for _, tok := range tokens {
 			if tok.Type == Unknown {
@@ -33,19 +26,30 @@ func findLetterLine(lines []string) int {
 			}
 		}
 
-		// Skip lines with more than 1 unknown token
 		if unknowns > 1 {
 			continue
 		}
 
 		if len(tokens) > maxTokens {
 			maxTokens = len(tokens)
-			letterLineIndex = i
+			bestIndex = i
 		}
 	}
 
-	Log("DEBUG", "Letter line identified at index %d", letterLineIndex)
-	return letterLineIndex
+	if bestIndex == -1 {
+		Log("WARN", "findPitchLine: no valid line found, falling back to longest tokenizable line")
+		maxTokens = 0
+		for i, line := range lines {
+			tokens := LexLine(line)
+			if len(tokens) > maxTokens {
+				maxTokens = len(tokens)
+				bestIndex = i
+			}
+		}
+	}
+
+	Log("DEBUG", "Letter line identified at index %d", bestIndex)
+	return bestIndex
 }
 
 func ClassifyLines(lines []string) []LineType {
@@ -71,12 +75,12 @@ func ClassifyLines(lines []string) []LineType {
 		types[i] = UnknownLineType
 	}
 
-	letterLineIndex := findLetterLine(lines)
+	letterLineIndex := findPitchLine(lines)
 	if letterLineIndex == -1 {
-		Log("ERROR", "No valid LetterLine found during classification.")
+		Log("ERROR", "No valid PitchLine found during classification.")
 		return []LineType{}
 	}
-	types[letterLineIndex] = LetterLineType
+	types[letterLineIndex] = PitchLineType
 
 	foundLowerOrLyric := false
 	foundLyric := false
@@ -116,7 +120,7 @@ func ClassifyLines(lines []string) []LineType {
 	}
 
 	for index, lineType := range types {
-		Log("DEBUG", "Line %d classified as %s", index, lineTypeNames[lineType])
+		Log("DEBUG", "Line %d classified as %s", index, LineTypeNames[lineType])
 	}
 
 	Log("DEBUG", "ClassifyLines result: %s", types)
