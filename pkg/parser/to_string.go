@@ -39,7 +39,7 @@ func FormatComposition(c *Composition, formatter *StringFormatter) {
 // FormatParagraph displays the letter line and any associated annotations.
 func FormatParagraph(p *Paragraph, formatter *StringFormatter) {
 	formatter.WriteLine("  ", fmt.Sprintf("Notation: %s", p.Notation))
-	FormatLetterLine(p.LetterLine, formatter, "  ")
+	FormatLine(p.Line, formatter, "  ")
 
 	if hasAnnotations(p.UpperAnnotations) {
 		formatter.WriteLine("  ", "Upper Annotations")
@@ -75,14 +75,14 @@ func FormatParagraph(p *Paragraph, formatter *StringFormatter) {
 	}
 }
 
-// FormatLetterLine shows the raw and parsed contents of a LetterLine.
-func FormatLetterLine(l *LetterLine, formatter *StringFormatter, indent string) {
+// FormatLine shows the raw and parsed contents of a Line.
+func FormatLine(l *Line, formatter *StringFormatter, indent string) {
 	if l == nil {
-		formatter.WriteLine(indent, "LetterLine: nil")
+		formatter.WriteLine(indent, "Line: nil")
 		return
 	}
 
-	formatter.WriteLine(indent, "LetterLine")
+	formatter.WriteLine(indent, "Line")
 	formatter.WriteLine(indent+"  ", "=== Raw Notation ===")
 	formatter.WriteLine(indent+"  ", l.Raw)
 	formatter.WriteLine(indent+"  ", "====================")

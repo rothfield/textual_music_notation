@@ -1,13 +1,13 @@
 package parser
 
-func ParseLetterLine(raw string, tokens []Token, system Notation) *LetterLine {
-	Log("DEBUG", "ParseLetterLine: raw='%s'", raw)
+func ParseLine(raw string, tokens []Token, system Notation) *Line {
+	Log("DEBUG", "ParseLine: raw='%s'", raw)
 	var parser *letterLineParser
 	parser = &letterLineParser{tokens: tokens, system: system}
-	var line *LetterLine
+	var line *Line
 	line = parser.parse()
 	line.Raw = raw
-	Log("DEBUG", "ParseLetterLine: parsed %d elements", len(line.Elements))
+	Log("DEBUG", "ParseLine: parsed %d elements", len(line.Elements))
 	return line
 }
 
@@ -18,7 +18,7 @@ type letterLineParser struct {
 	col    int
 }
 
-func (p *letterLineParser) parse() *LetterLine {
+func (p *letterLineParser) parse() *Line {
 	var elements []Element
 	for p.hasNext() {
 		var tok Token
@@ -42,7 +42,7 @@ func (p *letterLineParser) parse() *LetterLine {
 			p.next()
 		}
 	}
-	return &LetterLine{Elements: elements}
+	return &Line{Elements: elements}
 }
 
 func (p *letterLineParser) parseBeat() *Element {

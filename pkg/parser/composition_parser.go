@@ -53,7 +53,7 @@ func ParseComposition(input string) *Composition {
 		if strings.TrimSpace(para) != "" {
 			var paragraph *Paragraph
 			paragraph = ParseParagraph(strings.Split(para, "\n"))
-			if paragraph != nil && paragraph.LetterLine != nil && len(paragraph.LetterLine.Elements) > 0 {
+			if paragraph != nil && paragraph.Line != nil && len(paragraph.Line.Elements) > 0 {
 				parsedParagraphs = append(parsedParagraphs, paragraph)
 			}
 		}

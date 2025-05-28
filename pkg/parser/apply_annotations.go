@@ -1,6 +1,6 @@
 package parser
 
-func Walk(line *LetterLine, visit func(*Element)) {
+func Walk(line *Line, visit func(*Element)) {
 	for i := range line.Elements {
 		el := &line.Elements[i]
 		if el.IsBeat {
@@ -14,7 +14,7 @@ func Walk(line *LetterLine, visit func(*Element)) {
 }
 
 func ApplyAnnotations(p *Paragraph, annotations []Annotation) {
-	if p == nil || p.LetterLine == nil {
+	if p == nil || p.Line == nil {
 		return
 	}
 
@@ -23,7 +23,7 @@ func ApplyAnnotations(p *Paragraph, annotations []Annotation) {
 
 	// Flatten all pitch/dash-level elements with their positions
 	var elements []*Element
-	Walk(p.LetterLine, func(el *Element) {
+	Walk(p.Line, func(el *Element) {
 		elements = append(elements, el)
 	})
 
@@ -42,7 +42,7 @@ func ApplyAnnotations(p *Paragraph, annotations []Annotation) {
 			Log("DEBUG", "Folding annotation %s at column %d to element at col %d", ann.Type, ann.Column, el.Column)
 			applyAnnotation(el, ann)
 		} else if ann.Type == Syllable {
-			el := fallbackToLastPitch(p.LetterLine, ann)
+			el := fallbackToLastPitch(p.Line, ann)
 			if el != nil {
 				Log("DEBUG", "Fallback applied for syllable at column %d", ann.Column)
 				applyFallbackAnnotation(el, ann)
@@ -74,7 +74,7 @@ func applyAnnotation(el *Element, ann Annotation) {
 	}
 }
 
-func fallbackToLastPitch(line *LetterLine, ann Annotation) *Element {
+func fallbackToLastPitch(line *Line, ann Annotation) *Element {
 	for i := len(line.Elements) - 1; i >= 0; i-- {
 		el := &line.Elements[i]
 		if el.IsBeat {

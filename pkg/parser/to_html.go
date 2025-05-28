@@ -34,7 +34,7 @@ func RenderHTMLParagraph(p *Paragraph) string {
 		slurGroup = nil
 	}
 
-	for _, el := range p.LetterLine.Elements {
+	for _, el := range p.Line.Elements {
 		switch el.Token.Type {
 		case LeftSlur:
 			flushSlur()

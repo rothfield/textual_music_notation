@@ -1,7 +1,7 @@
 package parser
 
 type SplitLines struct {
-	LetterLine       string
+	Line             string
 	UpperAnnotations []string
 	LowerAnnotations []string
 	LyricLines       []string
@@ -15,7 +15,7 @@ func SplitParagraph(lines []string) SplitLines {
 	for i, typ := range types {
 		switch typ {
 		case LetterLineType:
-			result.LetterLine = lines[i]
+			result.Line = lines[i]
 		case UpperAnnotationType:
 			result.UpperAnnotations = append(result.UpperAnnotations, lines[i])
 		case LowerAnnotationType:

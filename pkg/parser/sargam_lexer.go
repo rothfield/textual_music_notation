@@ -1,6 +1,6 @@
 package parser
 
-func LexLetterLineSargam(input string) []Token {
+func LexLineSargam(input string) []Token {
 	var tokens []Token
 	i := 0
 	for i < len(input) {

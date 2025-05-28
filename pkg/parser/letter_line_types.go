@@ -1,6 +1,6 @@
 package parser
 
-type LetterLine struct {
+type Line struct {
 	Elements []Element
 	Raw      string
 }
