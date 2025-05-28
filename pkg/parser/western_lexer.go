@@ -1,6 +1,6 @@
 package parser
 
-func LexLetterLineWestern(line string) []Token {
+func LexABC(line string) []Token {
 	var tokens []Token
 	col := 0
 	for col < len(line) {
