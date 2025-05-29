@@ -69,3 +69,26 @@ pre.output {
   }
 }
 
+@media (min-width: 768px) {
+  .container {
+    max-width: none;
+    width: 100%;
+    padding: 1em;
+  }
+
+  .section {
+    padding: 1em;
+    margin-bottom: 1.5em;
+  }
+
+  #sections {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1.5em;
+  }
+
+  #sections > .section {
+    flex: 1 1 45%; /* Two columns on wide screens */
+  }
+}
+

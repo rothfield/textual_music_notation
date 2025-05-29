@@ -32,11 +32,22 @@ func ApplyAnnotations(p *Paragraph, annotations []Annotation) {
 		bestDist := 1000
 		for i, el := range elements {
 			dist := abs(el.Column - ann.Column)
-			if dist <= 1 && dist < bestDist {
-				best = i
-				bestDist = dist
+
+			if ann.Type == TokenTypeSyllable {
+				// Relaxed syllable: match nearest pitch only
+				if el.Token.Type == TokenTypePitch && dist < bestDist {
+					best = i
+					bestDist = dist
+				}
+			} else {
+				// Strict matching for other annotations
+				if dist <= 1 && dist < bestDist {
+					best = i
+					bestDist = dist
+				}
 			}
 		}
+
 		if best != -1 {
 			el := elements[best]
 			Log("DEBUG", "Folding annotation %s at column %d to element at col %d", ann.Type, ann.Column, el.Column)
@@ -55,7 +66,6 @@ func ApplyAnnotations(p *Paragraph, annotations []Annotation) {
 
 func applyAnnotation(el *Element, ann Annotation) {
 	Log("DEBUG", "applyAnnotation, annotation= Type=%s, Value=%s, Column=%d", ann.Type, ann.Value, ann.Column)
-	Log("DEBUG", "ann.Type= %s    HighestOctave=%s", ann.Type, TokenTypeHighestOctave)
 	switch ann.Type {
 	case TokenTypeUpperOctave:
 		el.Octave = 1
@@ -68,7 +78,11 @@ func applyAnnotation(el *Element, ann Annotation) {
 	case TokenTypeMordent:
 		el.Mordent = true
 	case TokenTypeSyllable:
-		el.Syllable = ann.Value
+		if el.Syllable == "" {
+			el.Syllable = ann.Value
+		} else {
+			el.ExtraSyllables = append(el.ExtraSyllables, ann.Value)
+		}
 	case TokenTypeTala:
 		el.Tala = ann.Value
 	}
@@ -104,3 +118,4 @@ func applyFallbackAnnotation(el *Element, ann Annotation) {
 	Log("DEBUG", "applyFallbackAnnotation: %s -> ExtraSyllables", ann.Value)
 	el.ExtraSyllables = append(el.ExtraSyllables, ann.Value)
 }
+

@@ -69,19 +69,10 @@ editor.addEventListener("input", () => {
   }, 200);
 });
 
-
 function formatHTML(html) {
-    const tab = "  ";
-    let result = "";
-    let indent = "";
-
-    html.split(/>\s*</).forEach((element) => {
-        if (element.match(/^\/\w/)) indent = indent.slice(0, -tab.length);
-        result += indent + "<" + element + ">\n";
-        if (element.match(/^<?\w[^>]*[^/]$/)) indent += tab;
-    });
-
-    return result.trim();
+  const div = document.createElement("div");
+  div.innerHTML = html;
+  return div.innerHTML;
 }
 
 

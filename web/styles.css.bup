@@ -1,0 +1,121 @@
+@import url('https://fonts.googleapis.com/css2?family=Fira+Code&display=swap');
+
+body {
+  font-family: "Arial", sans-serif;
+  background: #f3f4f6;
+  margin: 0;
+  padding: 1em 0;
+  color: #333;
+}
+
+.container {
+  max-width: 1000px;
+  margin: auto;
+  padding: 0 1em;
+}
+
+h1 {
+  font-size: 1.8em;
+  margin-bottom: 0.5em;
+}
+
+#connection-status {
+  padding: 0.4em 1em;
+  color: #fff;
+  background-color: #2e7d32;
+  border-radius: 6px;
+  font-weight: bold;
+  display: inline-block;
+  margin-bottom: 1em;
+  font-size: 0.95em;
+}
+
+textarea#editor {
+  width: 100%;
+  height: 6em;
+  font-family: 'Courier New', monospace;
+  font-size: 1em;
+  line-height: 1.2;
+  padding: 0.5em;
+  resize: vertical;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  background: #fff;
+  box-sizing: border-box;
+}
+
+#sections {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1em;
+  margin-top: 1em;
+  padding: 0;
+}
+
+@media (min-width: 700px) {
+  #sections {
+    grid-template-columns: 1fr 1fr;
+    grid-auto-rows: min-content;
+  }
+}
+
+.section {
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+  padding: 0.75em;
+}
+
+.section h2 {
+  font-size: 1.2em;
+  margin: 0 0 0.5em;
+}
+
+pre.output,
+pre.zoutput {
+  background: #f4f4f4;
+  padding: 0.75em;
+  border-radius: 6px;
+  overflow-x: auto;
+  white-space: pre-wrap;
+  word-break: break-word;
+  font-family: 'Fira Code', monospace;
+  font-size: 0.9em;
+  line-height: 1.4;
+  box-sizing: border-box;
+  max-width: 100%;
+}
+
+.svg-output {
+  border: 1px solid #ccc;
+  padding: 0.75em;
+  background: white;
+  overflow-x: auto;
+}
+
+.html-render {
+  background: #fff;
+  padding: 1em;
+  border: 1px solid #ddd;
+  min-height: 100px;
+  white-space: normal;
+  font-family: "Segoe UI", "Helvetica Neue", sans-serif;
+  font-size: 1em;
+}
+
+@media (max-width: 500px) {
+  h1 {
+    font-size: 1.4em;
+  }
+
+  textarea#editor {
+    font-size: 0.9em;
+    height: 5em;
+  }
+
+  .section h2 {
+    font-size: 1em;
+  }
+}
+

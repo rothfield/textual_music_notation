@@ -22,7 +22,7 @@ func handleMessage(msg string) map[string]string {
 	formatter := &parser.StringFormatter{}
 	parser.FormatComposition(parsed, formatter)
 	treeOutput := formatter.Builder.String()
-	htmlOutput := parser.RenderHTMLComposition(parsed)
+	htmlOutput := parser.CompositionToHTML(parsed)
 
 	logger.Log("DEBUG", "Tree Output:\n%s", treeOutput)
 	logger.Log("DEBUG", "HTML Output:\n%s", htmlOutput)
