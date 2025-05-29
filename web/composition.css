@@ -1,0 +1,110 @@
+/* Note container */
+paragraph {
+  font-family: "Segoe UI", "Helvetica Neue", "Arial", sans-serif;
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 1.4;
+  white-space: nowrap;
+}
+
+note {
+  display: inline-block;
+  position: relative;
+  margin: 0 3px;
+  font-size: 30px;
+  vertical-align: bottom;
+  height: 1em;
+  line-height: 1;
+}
+
+/* Pitch character */
+pitch {
+  display: inline;
+  font-weight: 600;
+}
+
+/* Octave dot (• or :) */
+octave {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 22px;
+  font-weight: bold;
+  pointer-events: none;
+  line-height: 1;
+}
+
+/* Octave dot above the note */
+octave[data-octave="1"],
+octave[data-octave="2"],
+octave[data-octave="3"] {
+  top: -0.7em;
+}
+
+/* Octave dot below the note */
+octave[data-octave="-1"],
+octave[data-octave="-2"],
+octave[data-octave="-3"] {
+  bottom: -0.6em;
+}
+
+/* Lyric syllable */
+syllable {
+  position: absolute;
+  bottom: -1.5em;
+  left: 50%;
+  transform: translateX(-50%);
+  font-family: serif;
+  font-size: 1.1em;
+  white-space: nowrap;
+}
+
+/* Beat wrapper */
+beat {
+  display: inline-block;
+  position: relative;
+  margin-right: 0.25em;
+}
+
+/* Loop arc if more than one note in beat */
+beat:has(note:nth-of-type(2))::after {
+  content: "";
+  position: absolute;
+  bottom: -0.6em;
+  left: 0;
+  right: 0;
+  height: 10px;
+  border-bottom: 2px solid black;
+  border-radius: 0 0 100% 100%;
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* Slur group arcs */
+slur-group {
+  display: inline-block;
+  position: relative;
+}
+
+slur-group::after {
+  content: "";
+  position: absolute;
+  top: -0.6em;
+  left: 0;
+  right: 0;
+  height: 10px;
+  border-top: 2px solid black;
+  border-radius: 100% 100% 0 0;
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* Simple symbols */
+barline,
+dash,
+breath {
+  display: inline-block;
+  margin: 0 2px;
+  font-weight: bold;
+}
+

@@ -63,7 +63,7 @@ textarea {
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
 }
 
-pre.output {
+pre.output, pre.zoutput {
   background: #f4f4f4;
   padding: 1em;
   border-radius: 6px;
@@ -79,7 +79,6 @@ pre.output {
   background: white;
 }
 
-/* === RENDERED HTML (PROPORTIONAL) === */
 .html-render {
   background: #fff;
   padding: 1em;
@@ -88,151 +87,5 @@ pre.output {
   white-space: normal;
   font-family: "Segoe UI", "Helvetica Neue", sans-serif;
   font-size: 1em;
-}
-
-/* === PITCH STRUCTURE === */
-.pitch-wrapper {
-  display: inline-block;
-  position: relative;
-  margin: 0 3px;
-  font-size: 30px;
-  vertical-align: bottom;
-  line-height: 1;
-  height: 1em;
-  overflow: visible;
-}
-
-.pitch {
-  display: inline;
-  font-weight: 600;
-  margin: 0;
-  padding: 0;
-  vertical-align: baseline;
-}
-
-/* === OCTAVE ANNOTATIONS === */
-.upper {
-  position: absolute;
-  top: -0.5em;
-  left: 50%;
-  transform: translateX(-50%);
-  font-size: 22px;
-  font-weight: bold;
-  pointer-events: none;
-  z-index: 1;
-}
-
-.lower.octave {
-  position: absolute;
-  bottom: -0.5em;
-  left: 50%;
-  transform: translateX(-50%);
-  font-size: 22px;
-  font-weight: bold;
-  pointer-events: none;
-  z-index: 1;
-}
-
-/* === LYRICS (LilyPond-style) === */
-.lyric-container {
-  position: absolute;
-  bottom: -1.6em;
-  left: 50%;
-  transform: translateX(-50%);
-  pointer-events: none;
-  z-index: 2;
-}
-
-.lower.lyric {
-  font-family: "Georgia", "Times New Roman", serif;
-  font-size: 18px;
-  font-weight: normal;
-  line-height: 1.1;
-  white-space: nowrap;
-  text-align: center;
-  opacity: 1;
-  letter-spacing: 0.03em;
-}
-
-/* === BEAT LOOP ARC === */
-.beat {
-  display: inline-block;
-  position: relative;
-  margin: 0;
-}
-
-.beat:has(.pitch-wrapper:nth-of-type(2))::after {
-  content: "";
-  position: absolute;
-  bottom: -0.6em;
-  left: 0;
-  right: 0;
-  height: 10px;
-  border-bottom: 2px solid black;
-  border-radius: 0 0 100% 100%;
-  pointer-events: none;
-  z-index: 0;
-}
-
-/* === SLUR ARC === */
-.slur-group {
-  display: inline-block;
-  position: relative;
-  margin: 0;
-}
-
-.slur-group::after {
-  content: "";
-  position: absolute;
-  top: -0.6em;
-  left: 0;
-  right: 0;
-  height: 10px;
-  border-top: 2px solid black;
-  border-radius: 100% 100% 0 0;
-  pointer-events: none;
-  z-index: 0;
-}
-
-/* === WHITESPACE TOKENS === */
-.space {
-  display: inline-block;
-  white-space: pre;
-  vertical-align: bottom;
-  font-size: 1em;
-}
-
-.slur-marker,
-.slur-marker.left-slur,
-.slur-marker.right-slur {
-    display: inline-block;
-    width: 0;
-    height: 0;
-    font-size: 0;
-    overflow: hidden;
-    color: transparent;
-    visibility: hidden;
-}
-
-
-.beat {
-    display: inline-block;
-    margin-right: 0.3em; /* spacing between beats */
-}
-
-.pitch-wrapper {
-    display: inline-block;
-    margin: 0;
-    padding: 0;
-    font-size: 1em;
-    line-height: 1;
-    vertical-align: baseline;
-}
-
-.pitch {
-    display: inline-block;
-    margin: 0;
-    padding: 0;
-    line-height: 1;
 }
 

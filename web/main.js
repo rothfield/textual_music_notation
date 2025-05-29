@@ -3,6 +3,7 @@ const lilypond = document.getElementById("lilypond-content");
 const editor = document.getElementById("editor");
 const svgContainer = document.getElementById("svg-container");
 const htmlOutput = document.getElementById("html-output");
+const htmlRaw = document.getElementById("html-raw");
 const connectionStatus = document.getElementById("connection-status");
 
 let socket;
@@ -39,6 +40,7 @@ function connect() {
     if (data.lilypond) lilypond.textContent = data.lilypond;
     if (data.svg) svgContainer.innerHTML = data.svg;
     if (data.html) htmlOutput.innerHTML = data.html;
+    if (data.html) htmlRaw.innerText = formatHTML(data.html);
   };
 
   socket.onerror = (error) => {
@@ -66,6 +68,22 @@ editor.addEventListener("input", () => {
     sendNotation();
   }, 200);
 });
+
+
+function formatHTML(html) {
+    const tab = "  ";
+    let result = "";
+    let indent = "";
+
+    html.split(/>\s*</).forEach((element) => {
+        if (element.match(/^\/\w/)) indent = indent.slice(0, -tab.length);
+        result += indent + "<" + element + ">\n";
+        if (element.match(/^<?\w[^>]*[^/]$/)) indent += tab;
+    });
+
+    return result.trim();
+}
+
 
 connect();
 
