@@ -8,17 +8,17 @@ import (
 
 func RenderHTMLComposition(c *Composition) string {
 	var sb strings.Builder
-	sb.WriteString(`<div class="composition">`)
+	sb.WriteString(`<composition>`) // semantic root tag
 	for _, p := range c.Paragraphs {
 		sb.WriteString(RenderHTMLParagraph(p))
 	}
-	sb.WriteString(`</div>`)
+	sb.WriteString(`</composition>`)
 	return sb.String()
 }
 
 func RenderHTMLParagraph(p *Paragraph) string {
 	var sb strings.Builder
-	sb.WriteString(`<div class="paragraph">`)
+	sb.WriteString(`<paragraph>`) // custom tag for semantic grouping
 
 	inSlur := false
 	var slurGroup []string
@@ -28,9 +28,9 @@ func RenderHTMLParagraph(p *Paragraph) string {
 			return
 		}
 		groupHTML := strings.Join(slurGroup, "")
-		sb.WriteString(`<div class="slur-group">`)
+		sb.WriteString(`<slur-group>`) // semantic grouping for slurs
 		sb.WriteString(groupHTML)
-		sb.WriteString(`</div>`)
+		sb.WriteString(`</slur-group>`)
 		slurGroup = nil
 	}
 
@@ -47,7 +47,6 @@ func RenderHTMLParagraph(p *Paragraph) string {
 		}
 
 		htmlChunk := renderElementHTML(&el)
-
 		if inSlur {
 			slurGroup = append(slurGroup, htmlChunk)
 		} else {
@@ -56,60 +55,61 @@ func RenderHTMLParagraph(p *Paragraph) string {
 	}
 
 	flushSlur()
-	sb.WriteString(`</div>`)
+	sb.WriteString(`</paragraph>`)
 	return sb.String()
 }
 
 func renderElementHTML(el *Element) string {
-	if el.Token.Type == LeftSlur || el.Token.Type == RightSlur {
-		return `<span class="slur-marker ` +
-			strings.ToLower(el.Token.Type.String()) + `" aria-hidden="true"></span>`
-	}
-
-	txt := html.EscapeString(el.Token.Value)
-	typ := strings.ToLower(el.Token.Type.String())
-
-	if len(el.SubElements) > 0 {
-		var sb strings.Builder
-		sb.WriteString(`<span class="beat">`)
-		for i := range el.SubElements {
-			sub := renderElementHTML(&el.SubElements[i])
-			sb.WriteString(sub)
+	switch el.Token.Type {
+	case Barline:
+		return fmt.Sprintf(`<barline>%s</barline>`, html.EscapeString(el.Token.Value))
+	case Breath:
+		return `<breath>'</breath>`
+	case Dash:
+		return `<dash>-</dash>`
+	case Pitch:
+		return renderNoteHTML(el)
+	default:
+		if len(el.SubElements) > 0 {
+			return renderBeatHTML(el)
 		}
-		sb.WriteString(`</span>`)
-		return sb.String()
+		return fmt.Sprintf(`<%s>%s</%s>`, strings.ToLower(el.Token.Type.String()), html.EscapeString(el.Token.Value), strings.ToLower(el.Token.Type.String()))
 	}
+}
 
+func renderNoteHTML(el *Element) string {
 	var sb strings.Builder
-	sb.WriteString(`<span class="pitch-wrapper">`)
+	sb.WriteString(`<note>`) // custom tag
 
-	// Upper octave: • or :
-	if el.Octave > 0 {
-		symbol := "•"
-		if el.Octave == 2 {
-			symbol = ":"
-		}
-		sb.WriteString(fmt.Sprintf(`<span class="upper">%s</span>`, symbol))
+	sb.WriteString(fmt.Sprintf(`<pitch>%s</pitch>`, html.EscapeString(el.Token.Value)))
+
+	if el.Octave != 0 {
+		sb.WriteString(fmt.Sprintf(`<octave data-octave="%d">%s</octave>`, el.Octave, "."))
 	}
-
-	sb.WriteString(fmt.Sprintf(`<span class="pitch %s">%s</span>`, typ, txt))
-
-	// Lower octave: • or :
-	if el.Octave < 0 {
-		symbol := "•"
-		if el.Octave == -2 {
-			symbol = ":"
-		}
-		sb.WriteString(fmt.Sprintf(`<span class="lower octave">%s</span>`, symbol))
-	}
-
-	// Lyric
 	if el.Syllable != "" {
-		sb.WriteString(`<span class="lyric-container">`)
-		sb.WriteString(fmt.Sprintf(`<span class="lower lyric">%s</span>`, html.EscapeString(el.Syllable)))
-		sb.WriteString(`</span>`)
+		sb.WriteString(fmt.Sprintf(`<syllable>%s</syllable>`, html.EscapeString(el.Syllable)))
 	}
 
-	sb.WriteString(`</span>`)
+	sb.WriteString(`</note>`)
+	return sb.String()
+}
+
+func renderBeatHTML(el *Element) string {
+	var sb strings.Builder
+
+	// Determine divisions (default is 4, omit if 4)
+	divs := el.Divisions
+	if divs != 4 && divs > 0 {
+		sb.WriteString(fmt.Sprintf(`<beat data-divisions="%d">`, divs))
+	} else {
+		sb.WriteString(`<beat>`)
+	}
+
+	for i := range el.SubElements {
+		sub := renderElementHTML(&el.SubElements[i])
+		sb.WriteString(sub)
+	}
+
+	sb.WriteString(`</beat>`)
 	return sb.String()
 }
