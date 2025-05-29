@@ -3,6 +3,7 @@ package parser
 import (
 	"fmt"
 	"strings"
+	"textual_music_notation/internal/logger"
 )
 
 // StringFormatter helps build a structured and indented string output.
@@ -44,8 +45,10 @@ func FormatParagraph(p *Paragraph, formatter *StringFormatter) {
 		formatter.WriteLine("  ", "Upper Annotations")
 		for _, anns := range p.UpperAnnotations {
 			var tokens []string
-			for _, ann := range anns {
-				tokens = append(tokens, fmt.Sprintf("[%s: %s @%d]", ann.Type, ann.Value, ann.Column))
+
+			for _, tok := range anns {
+				logger.Log("DEBUG", "hasAnnotations UpperAnnotations, token=%v", tok)
+				tokens = append(tokens, fmt.Sprintf("[%s: %s @%d]", tok.Type, tok.Value, tok.Column))
 			}
 			formatter.WriteLine("    ", strings.Join(tokens, " "))
 		}
@@ -105,7 +108,7 @@ func writeElement(formatter *StringFormatter, indent string, el Element) {
 	val := el.Token.Value
 
 	switch el.Token.Type {
-	case "Pitch":
+	case TokenTypePitch:
 		formatter.WriteLine(indent, fmt.Sprintf("- Pitch: %s [Column=%d], Octave: %d", val, col, el.Octave))
 		if el.Mordent {
 			formatter.WriteLine(indent+"  ", "Mordent: true")
@@ -133,4 +136,3 @@ func hasAnnotations(groups [][]Annotation) bool {
 	}
 	return false
 }
-

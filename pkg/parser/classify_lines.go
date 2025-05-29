@@ -21,7 +21,7 @@ func findPitchLine(lines []string) int {
 
 		unknowns := 0
 		for _, tok := range tokens {
-			if tok.Type == Unknown {
+			if tok.Type == TokenTypeUnknown {
 				unknowns++
 			}
 		}

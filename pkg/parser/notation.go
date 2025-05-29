@@ -88,7 +88,7 @@ func GuessNotation(line string) Notation {
 	for system, lexer := range lexers {
 		tokens := lexer(line)
 		for _, tok := range tokens {
-			if tok.Type == Pitch {
+			if tok.Type == TokenTypePitch {
 				scores[system]++
 			}
 		}

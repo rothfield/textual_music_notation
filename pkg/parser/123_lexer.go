@@ -45,7 +45,7 @@ func Lex123(line string) []Token {
 				"7b": struct{}{},
 				"7x": struct{}{},
 			}[candidate]; ok {
-				tokens = append(tokens, Token{Type: Pitch, Value: candidate, Column: col})
+				tokens = append(tokens, Token{Type: TokenTypePitch, Value: candidate, Column: col})
 				col += l
 				found = true
 				break

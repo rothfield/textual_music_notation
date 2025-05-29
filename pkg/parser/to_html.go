@@ -36,11 +36,11 @@ func RenderHTMLParagraph(p *Paragraph) string {
 
 	for _, el := range p.Line.Elements {
 		switch el.Token.Type {
-		case LeftSlur:
+		case TokenTypeLeftSlur:
 			flushSlur()
 			inSlur = true
 			continue
-		case RightSlur:
+		case TokenTypeRightSlur:
 			inSlur = false
 			flushSlur()
 			continue
@@ -61,13 +61,13 @@ func RenderHTMLParagraph(p *Paragraph) string {
 
 func renderElementHTML(el *Element) string {
 	switch el.Token.Type {
-	case Barline:
+	case TokenTypeBarline:
 		return fmt.Sprintf(`<barline>%s</barline>`, html.EscapeString(el.Token.Value))
-	case Breath:
+	case TokenTypeBreath:
 		return `<breath>'</breath>`
-	case Dash:
-		return `<dash>-</dash>`
-	case Pitch:
+	case TokenTypeDash:
+		return `<dash>&mdash;</dash>`
+	case TokenTypePitch:
 		return renderNoteHTML(el)
 	default:
 		if len(el.SubElements) > 0 {

@@ -9,7 +9,7 @@ func LexLyrics(line string) []Annotation {
 		if unicode.IsSpace(r) {
 			if start != -1 {
 				word := line[start:i]
-				annotations = append(annotations, Annotation{Type: Syllable, Value: word, Column: start})
+				annotations = append(annotations, Annotation{Type: TokenTypeSyllable, Value: word, Column: start})
 				start = -1
 			}
 		} else {
@@ -20,7 +20,7 @@ func LexLyrics(line string) []Annotation {
 	}
 	if start != -1 {
 		word := line[start:]
-		annotations = append(annotations, Annotation{Type: Syllable, Value: word, Column: start})
+		annotations = append(annotations, Annotation{Type: TokenTypeSyllable, Value: word, Column: start})
 	}
 	return annotations
 }

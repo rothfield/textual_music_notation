@@ -41,7 +41,7 @@ func ApplyAnnotations(p *Paragraph, annotations []Annotation) {
 			el := elements[best]
 			Log("DEBUG", "Folding annotation %s at column %d to element at col %d", ann.Type, ann.Column, el.Column)
 			applyAnnotation(el, ann)
-		} else if ann.Type == Syllable {
+		} else if ann.Type == TokenTypeSyllable {
 			el := fallbackToLastPitch(p.Line, ann)
 			if el != nil {
 				Log("DEBUG", "Fallback applied for syllable at column %d", ann.Column)
@@ -55,21 +55,21 @@ func ApplyAnnotations(p *Paragraph, annotations []Annotation) {
 
 func applyAnnotation(el *Element, ann Annotation) {
 	Log("DEBUG", "applyAnnotation, annotation= Type=%s, Value=%s, Column=%d", ann.Type, ann.Value, ann.Column)
-	Log("DEBUG", "ann.Type= %s    HighestOctave=%s", ann.Type, HighestOctave)
+	Log("DEBUG", "ann.Type= %s    HighestOctave=%s", ann.Type, TokenTypeHighestOctave)
 	switch ann.Type {
-	case UpperOctave:
+	case TokenTypeUpperOctave:
 		el.Octave = 1
-	case HighestOctave:
+	case TokenTypeHighestOctave:
 		el.Octave = 2
-	case LowerOctave:
+	case TokenTypeLowerOctave:
 		el.Octave = -1
-	case LowestOctave:
+	case TokenTypeLowestOctave:
 		el.Octave = -2
-	case Mordent:
+	case TokenTypeMordent:
 		el.Mordent = true
-	case Syllable:
+	case TokenTypeSyllable:
 		el.Syllable = ann.Value
-	case Tala:
+	case TokenTypeTala:
 		el.Tala = ann.Value
 	}
 }
@@ -80,12 +80,12 @@ func fallbackToLastPitch(line *Line, ann Annotation) *Element {
 		if el.IsBeat {
 			for j := len(el.SubElements) - 1; j >= 0; j-- {
 				sub := &el.SubElements[j]
-				if sub.Token.Type == Pitch {
+				if sub.Token.Type == TokenTypePitch {
 					return sub
 				}
 			}
 		} else {
-			if el.Token.Type == Pitch {
+			if el.Token.Type == TokenTypePitch {
 				return el
 			}
 		}

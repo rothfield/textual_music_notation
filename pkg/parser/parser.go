@@ -25,12 +25,12 @@ func (p *letterLineParser) parse() *Line {
 		tok = p.peek()
 		Log("DEBUG", "parse: next token = %s", tok)
 		switch tok.Type {
-		case Pitch, Dash:
+		case TokenTypePitch, TokenTypeDash:
 			var beat *Element
 			beat = p.parseBeat()
 			Log("DEBUG", "parse: parsed beat with %d divisions", beat.Divisions)
 			elements = append(elements, *beat)
-		case Barline, LeftSlur, RightSlur, Breath, Space:
+		case TokenTypeBarline, TokenTypeLeftSlur, TokenTypeRightSlur, TokenTypeBreath, TokenTypeSpace:
 			elements = append(elements, Element{
 				Token:  p.next(),
 				Column: p.col,
@@ -90,5 +90,5 @@ func (p *letterLineParser) next() Token {
 }
 
 func isAllowedInBeat(t TokenType) bool {
-	return t == Pitch || t == Dash || t == Breath || t == LeftSlur || t == RightSlur
+	return t == TokenTypePitch || t == TokenTypeDash || t == TokenTypeBreath || t == TokenTypeLeftSlur || t == TokenTypeRightSlur
 }

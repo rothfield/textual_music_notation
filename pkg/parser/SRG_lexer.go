@@ -15,14 +15,14 @@ func LexLineSargam(input string) []Token {
 		remaining := input[i:]
 
 		if m := whitespaceRE.FindString(remaining); m != "" {
-			tokens = append(tokens, Token{Type: Space, Value: m, Column: i})
+			tokens = append(tokens, Token{Type: TokenTypeSpace, Value: m, Column: i})
 			i += len(m)
 			continue
 		}
 
 		// Check for 4-character barline
 		if i+3 < len(input) && input[i:i+4] == ":||:" {
-			tokens = append(tokens, Token{Type: Barline, Value: ":||:", Column: i})
+			tokens = append(tokens, Token{Type: TokenTypeBarline, Value: ":||:", Column: i})
 			i += 4
 			continue
 		}
@@ -32,7 +32,7 @@ func LexLineSargam(input string) []Token {
 			pair := input[i : i+2]
 			switch pair {
 			case ".|", ":|", ":|:", ":||:", "[|", "|.", "|:", "|]", "||":
-				tokens = append(tokens, Token{Type: Barline, Value: pair, Column: i})
+				tokens = append(tokens, Token{Type: TokenTypeBarline, Value: pair, Column: i})
 				i += 2
 				continue
 			}
@@ -43,7 +43,7 @@ func LexLineSargam(input string) []Token {
 			two := input[i : i+2]
 			switch two {
 			case "P#", "D#", "R#", "S#", "Gb":
-				tokens = append(tokens, Token{Type: Pitch, Value: two, Column: i})
+				tokens = append(tokens, Token{Type: TokenTypePitch, Value: two, Column: i})
 				i += 2
 				continue
 			}
@@ -52,19 +52,19 @@ func LexLineSargam(input string) []Token {
 		char := input[i]
 		switch char {
 		case 'S', 'r', 'R', 'g', 'G', 'm', 'M', 'd', 'D', 'n', 'N':
-			tokens = append(tokens, Token{Type: Pitch, Value: string(char), Column: i})
+			tokens = append(tokens, Token{Type: TokenTypePitch, Value: string(char), Column: i})
 		case '-':
-			tokens = append(tokens, Token{Type: Dash, Value: string(char), Column: i})
+			tokens = append(tokens, Token{Type: TokenTypeDash, Value: string(char), Column: i})
 		case '|':
-			tokens = append(tokens, Token{Type: Barline, Value: string(char), Column: i})
+			tokens = append(tokens, Token{Type: TokenTypeBarline, Value: string(char), Column: i})
 		case '\'':
-			tokens = append(tokens, Token{Type: Breath, Value: string(char), Column: i})
+			tokens = append(tokens, Token{Type: TokenTypeBreath, Value: string(char), Column: i})
 		case '(':
-			tokens = append(tokens, Token{Type: LeftSlur, Value: string(char), Column: i})
+			tokens = append(tokens, Token{Type: TokenTypeLeftSlur, Value: string(char), Column: i})
 		case ')':
-			tokens = append(tokens, Token{Type: RightSlur, Value: string(char), Column: i})
+			tokens = append(tokens, Token{Type: TokenTypeRightSlur, Value: string(char), Column: i})
 		default:
-			tokens = append(tokens, Token{Type: Unknown, Value: string(char), Column: i})
+			tokens = append(tokens, Token{Type: TokenTypeUnknown, Value: string(char), Column: i})
 		}
 		i++
 	}
